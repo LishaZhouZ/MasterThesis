@@ -16,13 +16,18 @@ from config import *
 
 if __name__ == '__main__':
     print(tf.executing_eagerly())
-    #physical_devices = tf.config.experimental.list_physical_devices('GPU') 
-    try: 
-        tf.config.experimental.set_memory_growth(physical_devices[0], True) 
-        assert tf.config.experimental.get_memory_growth(physical_devices[0]) 
-    except: 
-        # Invalid device or cannot modify virtual devices once initialized. 
-        pass
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+      try:
+      # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+          tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+          logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+          print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        except RuntimeError as e:
+      # Memory growth must be set before GPUs have been initialized
+          print(e)
+
 
     #read dataset
     train_dataset = read_and_decode('./patches/MWCNN_train_data_debug.tfrecords')
