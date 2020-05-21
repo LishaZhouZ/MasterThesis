@@ -38,13 +38,8 @@ class DnCNN(tf.keras.Model):
     out5 = self.convblock1(out4)
 
     outE = self.convlayerEnd(out5)
-<<<<<<< HEAD
-    
-    output = outE + inputs
-    return output
-=======
+
     output_rearranged = tf.nn.depth_to_space(outE, 2, data_format='NHWC', name=None)
 
     output = output_rearranged + inputs
     return output
->>>>>>> 9f79043d0694ee1d6061094f0186415630dfd567
