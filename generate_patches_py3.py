@@ -72,8 +72,8 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
                     image_bayer = image_bayer.tobytes()
                     count += 1
                     example = tf.train.Example(features = tf.train.Features(feature={
-                        "img_label" : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_label])),
-                        "img_bayer" : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_bayer]))
+                        'img_label' : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_label])),
+                        'img_bayer' : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_bayer]))
                     }))
                     if count<= numPatches:
                         writer.write(example.SerializeToString())
@@ -92,8 +92,8 @@ if __name__ == '__main__':
     generate_patches(src_dir_label, src_dir_input, save_dir, debug_mode, tfRecord_name)
 
     #For validation data
-    val_dir_label = Path("./images/train/validation/live1_0-100")
-    val_dir_input = Path("./images/train/validation/live1_gt")
+    val_dir_label = Path("./images/train/validation/live1_gt")
+    val_dir_input = Path("./images/train/validation/live1_0-100")
     tfRecord_val_name = 'MWCNN_validation_data.tfrecords'
     print("Validation data will be generated:")
     generate_patches(val_dir_label, val_dir_input, save_dir, debug_mode, tfRecord_val_name)

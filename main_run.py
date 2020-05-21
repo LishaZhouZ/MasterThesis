@@ -1,10 +1,12 @@
 import argparse
 from glob import glob
+import datetime
 
 import tensorflow as tf
 import math
-from train_MWCNN import *
-from utils_py3_tfrecord_2 import *
+from utils_py3_tfrecord_2 import read_and_decode
+from train_model import *
+from model_DnCNN import DnCNN
 from config import *
 
 #weigth decay momentum optimizer
@@ -14,7 +16,7 @@ from config import *
 
 if __name__ == '__main__':
     print(tf.executing_eagerly())
-    physical_devices = tf.config.experimental.list_physical_devices('GPU') 
+    #physical_devices = tf.config.experimental.list_physical_devices('GPU') 
     try: 
         tf.config.experimental.set_memory_growth(physical_devices[0], True) 
         assert tf.config.experimental.get_memory_growth(physical_devices[0]) 
@@ -23,13 +25,13 @@ if __name__ == '__main__':
         pass
 
     #read dataset
-    train_dataset = read_and_decode('./patches/MWCNN_train_data.tfrecords')
+    train_dataset = read_and_decode('./patches/MWCNN_train_data_debug.tfrecords')
     val_dataset = read_and_decode('./patches/MWCNN_validation_data.tfrecords')
     #build model
-    model = MWCNN_m2()
+    model = DnCNN()
 
     #set up optimizer
-    optimizer = tf.optimizers.Adam(learning_rate=0.01, epsilon=1e-8, name='AdamOptimizer')
+    optimizer = tf.optimizers.Adam(learning_rate = alpha, epsilon=1e-8, name='AdamOptimizer')
 
     writer = tf.summary.create_file_writer('./logs/'+ datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer = optimizer, net = model)

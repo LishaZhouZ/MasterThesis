@@ -1,11 +1,49 @@
 import tensorflow as tf
-import pywt
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers
-from utils_py3_tfrecord_2 import *
-# network structure
+#from utils_py3_tfrecord_2 import *
 
+#return the average psnr for
+#PSNR Metric
+class PSNRMetric(tf.keras.metrics.Metric):
+  def __init__(self, name='psnr', **kwargs):
+    super(PSNRMetric, self).__init__(name=name, **kwargs)
+    self.psnr = self.add_weight(name='psnr', initializer='zeros')
+    self.count = self.add_weight(name='count', initializer='zeros')
+  
+  def update_state(self, y_true, y_pred):
+    psnr1 = tf.reduce_mean(tf.image.psnr(y_true, y_pred, max_val=255.0))
+    self.psnr.assign_add(psnr1)
+    self.count.assign_add(1)
+
+  def result(self):
+    return self.psnr/self.count
+
+#MS_SSIMMetric
+class MS_SSIMMetric(tf.keras.metrics.Metric):
+  def __init__(self, name='psnr', **kwargs):
+    super(MS_SSIMMetric, self).__init__(name=name, **kwargs)
+    self.ms_ssim = self.add_weight(name='ms_ssim', initializer='zeros')
+    self.count = self.add_weight(name='count', initializer='zeros')
+  
+  def update_state(self, y_true, y_pred):
+    mssim = tf.reduce_mean( tf.image.ssim_multiscale(y_pred, y_true, 255.0))
+    self.ms_ssim.assign_add(mssim) #output is 4x1 array
+    self.count.assign_add(1)
+
+  def result(self):
+    return self.ms_ssim/self.count
+
+#l2 loss
+def loss_l2(prediction, groundtruth):
+  #inv_converted = wavelet_inverse_conversion(prediction)
+  frobenius_norm = tf.norm(prediction-groundtruth, ord='fro', axis=(1, 2))
+  lossRGB = (1/2)*(tf.reduce_mean(frobenius_norm**2))
+  #regularization loss
+  return lossRGB
+
+#Wavelet layer
 class WaveletConvLayer(tf.keras.layers.Layer):
   def __init__(self):
     super(WaveletConvLayer, self).__init__()
@@ -44,43 +82,6 @@ class WaveletInvLayer(tf.keras.layers.Layer):
     concated = tf.concat([aa, bb, cc, dd], 3)
     reconstructed = tf.nn.depth_to_space(concated, 2)
     return reconstructed
-
-#return the average psnr for
-class PSNRMetric(tf.keras.metrics.Metric):
-  def __init__(self, name='psnr', **kwargs):
-    super(PSNRMetric, self).__init__(name=name, **kwargs)
-    self.psnr = self.add_weight(name='psnr', initializer='zeros')
-    self.count = self.add_weight(name='count', initializer='zeros')
-  
-  def update_state(self, y_true, y_pred):
-    psnr1 = tf.reduce_mean(tf.image.psnr(y_true, y_pred, max_val=255.0))
-    self.psnr.assign_add(psnr1)
-    self.count.assign_add(1)
-
-  def result(self):
-    return self.psnr/self.count
-
-class MS_SSIMMetric(tf.keras.metrics.Metric):
-  def __init__(self, name='psnr', **kwargs):
-    super(MS_SSIMMetric, self).__init__(name=name, **kwargs)
-    self.ms_ssim = self.add_weight(name='ms_ssim', initializer='zeros')
-    self.count = self.add_weight(name='count', initializer='zeros')
-  
-  def update_state(self, y_true, y_pred):
-    mssim = tf.reduce_mean( tf.image.ssim_multiscale(y_pred, y_true, 255.0))
-    self.ms_ssim.assign_add(mssim) #output is 4x1 array
-    self.count.assign_add(1)
-
-  def result(self):
-    return self.ms_ssim/self.count
-
-
-def loss_fn(prediction, groundtruth):
-  #inv_converted = wavelet_inverse_conversion(prediction)
-  frobenius_norm = tf.norm(prediction-groundtruth, ord='fro', axis=(1, 2))
-  lossRGB = (1/2)*(tf.reduce_mean(frobenius_norm)**2)
-  #regularization loss
-  return lossRGB
 
 class ConvConcatLayer(layers.Layer):
   def __init__(self, feature_num, kernel_size, my_initial, my_regular):
