@@ -16,7 +16,7 @@ class DnCNN(tf.keras.Model):
         kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
     self.reluStart = layers.ReLU()
     
-    self.convlayerEnd = layers.Conv2D(3, (3,3), padding = 'SAME',
+    self.convlayerEnd = layers.Conv2D(12, (3,3), padding = 'SAME',
         kernel_initializer = self.my_initial,kernel_regularizer = self.my_regular)
 
     self.convblock1 = ConvBlock(64, (3,3), self.my_initial, self.my_regular)
@@ -26,9 +26,9 @@ class DnCNN(tf.keras.Model):
     self.convblock5 = ConvBlock(64, (3,3), self.my_initial, self.my_regular)
 
   def call(self, inputs, training=False):
-    
+    input_arranged = tf.nn.space_to_depth(inputs, 2, data_format='NHWC', name=None)
     #fist layer
-    start = self.convlayerStart(inputs)
+    start = self.convlayerStart(input_arranged)
     outS = self.reluStart(start)
 
     out1 = self.convblock1(outS)
@@ -38,6 +38,13 @@ class DnCNN(tf.keras.Model):
     out5 = self.convblock1(out4)
 
     outE = self.convlayerEnd(out5)
+<<<<<<< HEAD
     
     output = outE + inputs
     return output
+=======
+    output_rearranged = tf.nn.depth_to_space(outE, 2, data_format='NHWC', name=None)
+
+    output = output_rearranged + inputs
+    return output
+>>>>>>> 9f79043d0694ee1d6061094f0186415630dfd567

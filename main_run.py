@@ -29,8 +29,8 @@ if __name__ == '__main__':
 
 
     #read dataset
-    train_dataset = read_and_decode('/mnt/data4/Student/Lisha/patches/MWCNN_train_data_debug.tfrecords')
-    val_dataset = read_and_decode('/mnt/data4/Student/Lisha/patches/MWCNN_validation_data.tfrecords')
+    train_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/MWCNN_train_data.tfrecords')
+    val_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/MWCNN_validation_data.tfrecords')
     #build model
     model = DnCNN()
 
