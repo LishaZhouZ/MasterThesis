@@ -17,14 +17,19 @@ parser.add_argument('--augment', dest='DATA_AUG_TIMES', type=int, default=1, hel
 args = parser.parse_args()
 
 def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
+    
     filepaths_label = sorted(dir_label.glob('*'))
-    filepaths_input = sorted(dir_input.glob('*'))
-
+    
     if isDebug:
-        numDebug = 80
+        numDebug = 30
         filepaths_label = filepaths_label[:numDebug] # take only ten images to quickly debug
-        filepaths_input = filepaths_input[:numDebug]
     print("number of training images %d" % len(filepaths_label))
+    
+    filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
+    q_input = []
+    for qulaity in range(0,101,5):
+        q_input.append(Path(dir_input, Path('qp'+str(qulaity))))
+    
     count = 0 # calculate the number of patches
     for i in range(len(filepaths_label)):
         img = Image.open(filepaths_label[i])
@@ -32,43 +37,43 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
         for x in range(0 + args.step, (im_h - patch_size), args.stride):
             for y in range(0 + args.step, (im_w - patch_size), args.stride):
                 count += 1
-    origin_patch_num = count * (args.DATA_AUG_TIMES)
+
+    origin_patch_num = count
     if origin_patch_num % batch_size != 0:
-        numPatches = int(origin_patch_num / batch_size) * batch_size
+        numPatches = 21* int(origin_patch_num / batch_size) * batch_size
     else:
-        numPatches = int(origin_patch_num)
+        numPatches = 21* int(origin_patch_num)
+
     print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, batch_size, numPatches / batch_size))
     time.sleep(2)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)    
+    
     count = 0
 
-    # generate patches
     writer = tf.io.TFRecordWriter(save_dir + '/' + tfRecord_name)
+    # generate patches
+    
     for i in range(len(filepaths_label)):
-        img = Image.open(filepaths_label[i])
-        img_input = Image.open(filepaths_input[i])
-        
-        img_s = np.array(img, dtype="uint8")
-        img_s_input = np.array(img_input, dtype="uint8")
-        im_h, im_w, im_c = img_s.shape
         print("The %dth image of %d training images" %(i+1, len(filepaths_label)))
-        for j in range(args.DATA_AUG_TIMES):
+        for q in range(len(q_input)):
+            img = Image.open(filepaths_label[i])
+            img_input = Image.open(Path(q_input[q], filenames[i]))
+            img_s = np.array(img, dtype="uint8")
+            img_s_input = np.array(img_input, dtype="uint8")
+            im_h, im_w, im_c = img_s.shape
+
             for x in range(0 + args.step, im_h - patch_size, args.stride):
                 for y in range(0 + args.step, im_w - patch_size, args.stride):
-                    if j == 0:
-                        random_seed = 0
-                    else:
-                        random_seed = random.randint(1, 7)
-                    image_label = data_augmentation(img_s[x:x + patch_size, y:y + patch_size, 0:3], random_seed) # some images have an extra blank channel 
-                    image_bayer = data_augmentation(img_s_input[x:x + patch_size, y:y + patch_size, 0:3], random_seed)
-                    
+                    image_label = img_s[x:x + patch_size, y:y + patch_size, 0:3]
+                    image_bayer = img_s_input[x:x + patch_size, y:y + patch_size, 0:3]
+
                     image_label = image_label.tobytes()
                     image_bayer = image_bayer.tobytes()
                     count += 1
                     example = tf.train.Example(features = tf.train.Features(feature={
-                        "img_label":tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_label])),
-                        'img_bayer':tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_bayer]))
+                        "img_label" : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_label])),
+                        "img_bayer" : tf.train.Feature(bytes_list = tf.train.BytesList(value=[image_bayer]))
                     }))
                     if count<= numPatches:
                         writer.write(example.SerializeToString())
@@ -80,15 +85,15 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
 
 if __name__ == '__main__': 
     src_dir_label = Path("./images/train/groundtruth")
-    src_dir_input = Path("./images/train/CompressedQ10")
+    src_dir_input = Path("./images/train/qp0-100")
     save_dir = './patches'
-    tfRecord_name = 'MWCNN_train_data.tfrecords'
+    tfRecord_name = 'MWCNN_train_data_debug.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, debug_mode, tfRecord_name)
 
     #For validation data
-    val_dir_label = Path("./images/train/validation/groundtruth")
-    val_dir_input = Path("./images/train/validation/CompressedQ10")
+    val_dir_label = Path("./images/train/validation/live1_0-100")
+    val_dir_input = Path("./images/train/validation/live1_gt")
     tfRecord_val_name = 'MWCNN_validation_data.tfrecords'
     print("Validation data will be generated:")
     generate_patches(val_dir_label, val_dir_input, save_dir, debug_mode, tfRecord_val_name)
