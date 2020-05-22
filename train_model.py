@@ -37,13 +37,21 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt):
     org_psnr = PSNRMetric()
     opt_psnr = PSNRMetric()
     avg_loss = tf.keras.metrics.Mean()
+    rgb_loss = tf.keras.metrics.Mean()
+    reg_loss = tf.keras.metrics.Mean()
     for images, labels in dataset:
         loss_RGB, reconstructed = grad(model, images, labels, optimizer)
         #loss_RGB, reg_losses, total_loss, reconstructed = grad(model, images, labels, optimizer)
+        reg_losses = tf.math.add_n(model.losses)
+        total_loss = loss_RGB + reg_losses
+
         org_psnr(images, labels)
         opt_psnr(reconstructed, labels)
-        avg_loss(loss_RGB)
-        #avg_loss(total_loss)
+        #avg_loss(loss_RGB)
+        avg_loss(total_loss)
+        rgb_loss(loss_RGB)
+        reg_loss(reg_losses)
+
         step = ckpt.step.numpy()
         if int(step) % record_step == 0:
             avg_relative_psnr = opt_psnr.result() - org_psnr.result()
@@ -55,8 +63,8 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt):
             with writer.as_default():
                 tf.summary.scalar('optimizer_lr_t', optimizer.learning_rate, step = step)
                 tf.summary.scalar('train_loss', avg_loss.result(), step = step)
-                #tf.summary.scalar('lossRGB', loss_RGB, step = step)
-                #tf.summary.scalar('reg_loss', reg_losses, step = step)
+                tf.summary.scalar('lossRGB', rgb_loss.result(), step = step)
+                tf.summary.scalar('reg_loss', reg_loss.result(), step = step)
                 tf.summary.scalar('train_psnr', opt_psnr.result(), step = step)
                 tf.summary.scalar('original_psnr', org_psnr.result(), step = step)
                 tf.summary.scalar('relative_tr_psnr', avg_relative_psnr, step = step)
@@ -64,6 +72,8 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt):
             org_psnr.reset_states()
             opt_psnr.reset_states()
             avg_loss.reset_states()
+            rgb_loss.reset_states()
+            reg_loss.reset_states()
 
         ckpt.step.assign_add(1)
 
@@ -79,13 +89,13 @@ def evaluate_model(model, val_dataset, writer, epoch):
 
         # Update val metrics
         loss_RGB = loss_l2(output, label_val)
-        #reg_losses = tf.math.add_n(model.losses)
-        #total_loss = loss_RGB + reg_losses
+        reg_losses = tf.math.add_n(model.losses)
+        total_loss = loss_RGB + reg_losses
         #record the things
         org_psnr.update_state(label_val, images_val)
         psnr.update_state(label_val, output)
-        epoch_loss.update_state(loss_RGB)
-        #epoch_loss.update_state(total_loss)
+        #epoch_loss.update_state(loss_RGB)
+        epoch_loss.update_state(total_loss)
         ms_ssim.update_state(label_val, output)
     
     val_psnr = psnr.result()
