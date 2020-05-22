@@ -2,3 +2,4 @@ images/*
 *.tfrecords
 __pycache__
 logs
+tf_ckpts
