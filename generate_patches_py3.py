@@ -48,7 +48,7 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     time.sleep(2)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)    
-    
+    return
     count = 0
 
     writer = tf.io.TFRecordWriter(save_dir + '/' + tfRecord_name)

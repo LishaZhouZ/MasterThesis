@@ -28,7 +28,7 @@ class MS_SSIMMetric(tf.keras.metrics.Metric):
     self.count = self.add_weight(name='count', initializer='zeros')
   
   def update_state(self, y_true, y_pred):
-    mssim = tf.reduce_mean( tf.image.ssim_multiscale(y_pred, y_true, 255.0))
+    mssim = tf.reduce_mean(tf.image.ssim(y_pred, y_true, 255.0))
     self.ms_ssim.assign_add(mssim) #output is 4x1 array
     self.count.assign_add(1)
 

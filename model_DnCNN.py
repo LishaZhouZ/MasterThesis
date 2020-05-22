@@ -2,7 +2,7 @@ from model_utility import ConvBlock
 import tensorflow as tf
 from tensorflow.keras import layers
 
-batch_size = 32
+batch_size = 64
 patch_size = 160
 
 class DnCNN(tf.keras.Model):
