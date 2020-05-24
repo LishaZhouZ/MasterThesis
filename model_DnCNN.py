@@ -32,10 +32,10 @@ class DnCNN(tf.keras.Model):
     outS = self.reluStart(start)
 
     out1 = self.convblock1(outS)
-    out2 = self.convblock1(out1)
-    out3 = self.convblock1(out2)
-    out4 = self.convblock1(out3)
-    out5 = self.convblock1(out4)
+    out2 = self.convblock2(out1)
+    out3 = self.convblock3(out2)
+    out4 = self.convblock4(out3)
+    out5 = self.convblock5(out4)
 
     outE = self.convlayerEnd(out5)
 

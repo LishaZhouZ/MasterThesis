@@ -1,4 +1,7 @@
+import sys
+sys.path.insert(1, '../')
 from config import model
+from config import restore_ckptPath
 import os
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -20,6 +23,18 @@ import timeit
 
 if __name__ == "__main__":
 
+    print(tf.executing_eagerly())
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+      try:
+      # Currently, memory growth needs to be the same across GPUs
+        tf.config.experimental.set_visible_devices(gpus[3], 'GPU')
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+      except RuntimeError as e:
+      # Memory growth must be set before GPUs have been initialized
+          print(e)
+
     dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')
     dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100')
     
@@ -30,7 +45,7 @@ if __name__ == "__main__":
         q_input.append(Path(dir_input, Path('qp'+str(qulaity))))
     
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
-    ckpt.restore(tf.train.latest_checkpoint()).expect_partial()
+    ckpt.restore(tf.train.latest_checkpoint(restore_ckptPath)).expect_partial()
 
 #---------------------------------------------------------------------------------------
     org_psnr = np.zeros(len(filepaths_label))
@@ -125,7 +140,7 @@ if __name__ == "__main__":
 
 
             #save_images(Path('/home/lisha/Forschungspraxis/outcome/m2/' + str(i) + '-5.bmp'), img_s_label, noisy_image = img_s_input.numpy(), clean_image = np.squeeze(output_cut, axis=0))
-        print('For quality %d:' % str(q))
+        print('For quality %d:' % q)
         print('average org_psnr:%.4f' % np.mean(org_psnr))
         print('average after_psnr:%.4f' % np.mean(rec_psnr))
         print('average org_ssim:%.4f' % np.mean(org_ssim))

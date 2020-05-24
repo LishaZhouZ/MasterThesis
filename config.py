@@ -1,7 +1,10 @@
 import numpy as np
 import model_DnCNN
+from pathlib import Path
 
-debug_mode = False
+model = model_DnCNN.DnCNN()
+restore_ckptPath = Path("./tf_ckpts")
+debug_mode = True
 channel = 3
 batch_size = model_DnCNN.batch_size
 patch_size = model_DnCNN.patch_size
