@@ -10,7 +10,7 @@ batch_size = model_DnCNN.batch_size
 patch_size = model_DnCNN.patch_size
 epochs = 50
 record_step = 1
-alpha = 0.01
+alpha = 0.00001
 decay_lr = np.ones(epochs+1)
 decay_lr[0:10]= alpha
 decay_lr[10:20]= alpha/10
@@ -24,6 +24,6 @@ decay_lr[40:50] = alpha/10000
 checkpoint_directory = './tf_ckpts'
 
 if debug_mode == True:
-    batch_size = 32
+    batch_size = 8
 
 

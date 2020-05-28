@@ -2,7 +2,7 @@ import time
 import numpy as np
 import tensorflow as tf
 #import matplotlib.pyplot as plt
-from model_utility import loss_l2, PSNRMetric, MS_SSIMMetric
+from model_utility import loss_l1, PSNRMetric, MS_SSIMMetric
 from config import record_step
 import datetime
 
@@ -27,7 +27,7 @@ def grad(model, images, labels, optimizer):
     with tf.GradientTape() as tape:
         output = model(images, training=True)
         #reconstructed = tf.clip_by_value(images + output, clip_value_min=0., clip_value_max=255.)
-        loss_RGB = loss_l2(output, labels)
+        loss_RGB = loss_l1(output, labels)
     grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
@@ -88,7 +88,7 @@ def evaluate_model(model, val_dataset, writer, epoch):
         output = model(images_val, training = False)
 
         # Update val metrics
-        loss_RGB = loss_l2(output, label_val)
+        loss_RGB = loss_l1(output, label_val)
         reg_losses = tf.math.add_n(model.losses)
         total_loss = loss_RGB + reg_losses
         #record the things

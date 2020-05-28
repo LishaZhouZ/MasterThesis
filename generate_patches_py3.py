@@ -48,7 +48,6 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     time.sleep(2)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)    
-    return
     count = 0
 
     writer = tf.io.TFRecordWriter(save_dir + '/' + tfRecord_name)
@@ -87,14 +86,14 @@ if __name__ == '__main__':
     src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
     src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
     save_dir = '/mnt/data4/Students/Lisha/patches'
-    tfRecord_name = 'MWCNN_train_data.tfrecords'
+    tfRecord_name = 'MWCNN_train_data_debug.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, debug_mode, tfRecord_name)
 
     #For validation data
     val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
     val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
-    tfRecord_val_name = 'MWCNN_validation_data.tfrecords'
+    tfRecord_val_name = 'MWCNN_validation_data_debug.tfrecords'
     print("Validation data will be generated:")
     generate_patches(val_dir_label, val_dir_input, save_dir, debug_mode, tfRecord_val_name)
 

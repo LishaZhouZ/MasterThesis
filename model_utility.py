@@ -43,6 +43,14 @@ def loss_l2(prediction, groundtruth):
   #regularization loss
   return lossRGB
 
+#l2 loss
+def loss_l1(prediction, groundtruth):
+  #inv_converted = wavelet_inverse_conversion(prediction)
+  absLoss = tf.abs(prediction-groundtruth)
+  lossRGB = tf.reduce_mean(absLoss)
+  #regularization loss
+  return lossRGB
+
 #Wavelet layer
 class WaveletConvLayer(tf.keras.layers.Layer):
   def __init__(self):

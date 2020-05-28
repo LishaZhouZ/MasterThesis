@@ -6,7 +6,7 @@ import tensorflow as tf
 import math
 from utils_py3_tfrecord_2 import read_and_decode
 from train_model import *
-from model_DnCNN import DnCNN
+from DnCNN_Feature_Attention import DnCNN
 from config import *
 
 #weigth decay momentum optimizer
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if gpus:
       try:
       # Currently, memory growth needs to be the same across GPUs
-        tf.config.experimental.set_visible_devices(gpus[3], 'GPU')
+        tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
         logical_gpus = tf.config.experimental.list_logical_devices('GPU')
         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
       except RuntimeError as e:
@@ -28,9 +28,9 @@ if __name__ == '__main__':
           print(e)
 
 
-    #read dataset
-    train_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/MWCNN_train_data.tfrecords')
-    val_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/MWCNN_validation_data.tfrecords')
+    #read dataset /mnt/data4/Students/Lisha/
+    train_dataset = read_and_decode('./patches/MWCNN_train_data.tfrecords')
+    val_dataset = read_and_decode('./patches/MWCNN_validation_data.tfrecords')
     #build model
     model = DnCNN()
 

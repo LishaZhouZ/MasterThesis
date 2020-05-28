@@ -2,4 +2,5 @@ images/*
 *.tfrecords
 __pycache__
 logs
-tf_ckpts
+tf_ckpts/*
+nohub.out
