@@ -6,7 +6,7 @@ import tensorflow as tf
 import math
 from utils_py3_tfrecord_2 import read_and_decode
 from train_model import *
-from DnCNN_Feature_Attention import DnCNN
+
 from config import *
 
 #weigth decay momentum optimizer
@@ -32,7 +32,6 @@ if __name__ == '__main__':
     train_dataset = read_and_decode('./patches/MWCNN_train_data.tfrecords')
     val_dataset = read_and_decode('./patches/MWCNN_validation_data.tfrecords')
     #build model
-    model = DnCNN()
 
     #set up optimizer
     optimizer = tf.optimizers.Adam(learning_rate = alpha, epsilon=1e-8, name='AdamOptimizer')

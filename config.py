@@ -1,13 +1,13 @@
 import numpy as np
-import model_DnCNN
+import DnCNN_Feature_Attention as variants
 from pathlib import Path
 
-model = model_DnCNN.DnCNN()
+model = variants.DnCNN()
 restore_ckptPath = Path("./tf_ckpts")
 debug_mode = True
 channel = 3
-batch_size = model_DnCNN.batch_size
-patch_size = model_DnCNN.patch_size
+batch_size = variants.batch_size
+patch_size = variants.patch_size
 epochs = 50
 record_step = 1
 alpha = 0.00001
