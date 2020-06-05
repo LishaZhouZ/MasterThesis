@@ -2,6 +2,7 @@ import tensorflow as tf
 #import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers
+
 #from utils_py3_tfrecord_2 import *
 
 #return the average psnr for
@@ -47,7 +48,8 @@ def loss_l2(prediction, groundtruth):
 def loss_l1(prediction, groundtruth):
   #inv_converted = wavelet_inverse_conversion(prediction)
   absLoss = tf.abs(prediction-groundtruth)
-  lossRGB = tf.reduce_mean(absLoss)
+  lossSum = tf.reduce_sum(absLoss,[1,2,3])
+  lossRGB = tf.reduce_mean(lossSum)
   #regularization loss
   return lossRGB
 
@@ -92,9 +94,9 @@ class WaveletInvLayer(tf.keras.layers.Layer):
     return reconstructed
 
 class ConvConcatLayer(layers.Layer):
-  def __init__(self, feature_num, kernel_size, my_initial, my_regular):
+  def __init__(self, feature_num, kernel_size, my_initial, my_regular, dilated=1):
     super(ConvConcatLayer, self).__init__()
-    self.conv = layers.Conv2D(feature_num, kernel_size, padding = 'SAME',
+    self.conv = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
         kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
     self.bn = layers.BatchNormalization()
     self.relu = layers.ReLU()

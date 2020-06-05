@@ -5,7 +5,7 @@ import datetime
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_2 import read_and_decode
-from train_model import *
+from train_model import train_one_epoch, evaluate_model
 
 from config import *
 
@@ -29,8 +29,8 @@ if __name__ == '__main__':
 
 
     #read dataset /mnt/data4/Students/Lisha/
-    train_dataset = read_and_decode('./patches/MWCNN_train_data.tfrecords')
-    val_dataset = read_and_decode('./patches/MWCNN_validation_data.tfrecords')
+    train_dataset = read_and_decode('./patches_MWCNN/MWCNN_train_data_debug.tfrecords')
+    val_dataset = read_and_decode('./patches_MWCNN/MWCNN_validation_data_debug.tfrecords')
     #build model
 
     #set up optimizer
@@ -53,9 +53,9 @@ if __name__ == '__main__':
         print('Start of epoch %d' % (epoch,))
         optimizer.learning_rate = decay_lr[epoch]
         train_one_epoch(model, train_dataset, optimizer, writer, ckpt)
-        evaluate_model(model, val_dataset, writer, epoch)
+        #evaluate_model(model, val_dataset, writer, epoch)
         # save the checkpoint in every epoch
-        save_path = manager.save()
-        print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
+        #save_path = manager.save()
+        #print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
 
     print("Training saved")

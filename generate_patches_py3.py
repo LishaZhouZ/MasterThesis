@@ -10,7 +10,7 @@ from utils_py3_tfrecord_2 import *
 from config import *
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=160, help='stride')
+parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
 parser.add_argument('--step', dest='step', type=int, default=0, help='step, or padding')
 parser.add_argument('--augment', dest='DATA_AUG_TIMES', type=int, default=1, help='data augmentation, used to creat more data')
 # check output arguments
@@ -55,7 +55,7 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     
     for i in range(len(filepaths_label)):
         print("The %dth image of %d training images" %(i+1, len(filepaths_label)))
-        for q in range(len(q_input)):
+        for q in range(13,14): #len(q_input)
             img = Image.open(filepaths_label[i])
             img_input = Image.open(Path(q_input[q], filenames[i]))
             img_s = np.array(img, dtype="uint8")
@@ -83,16 +83,16 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     print("Data has been written into TFrecord.")
 
 if __name__ == '__main__': 
-    src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
-    src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
-    save_dir = '/mnt/data4/Students/Lisha/patches'
+    src_dir_label = Path("/home/lisha/MasterThesis/images/train/groundtruth")
+    src_dir_input = Path("/home/lisha/MasterThesis/images/train/qp0-100")
+    save_dir = './patches_MWCNN'
     tfRecord_name = 'MWCNN_train_data_debug.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, debug_mode, tfRecord_name)
 
     #For validation data
-    val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
-    val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
+    val_dir_label = Path("/home/lisha/MasterThesis/images/validation/live1_gt")
+    val_dir_input = Path("/home/lisha/MasterThesis/images/validation/live1_0-100")
     tfRecord_val_name = 'MWCNN_validation_data_debug.tfrecords'
     print("Validation data will be generated:")
     generate_patches(val_dir_label, val_dir_input, save_dir, debug_mode, tfRecord_val_name)
