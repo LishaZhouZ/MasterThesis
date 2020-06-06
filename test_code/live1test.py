@@ -1,7 +1,5 @@
 import sys
 sys.path.insert(1, '../')
-from config import model
-from config import restore_ckptPath
 import os
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -11,14 +9,13 @@ import numpy as np
 import math
 import tensorflow as tf
 import timeit
+import model_DnCNN
+import argparse
 
-#parser = argparse.ArgumentParser(description='')
-#parser.add_argument('--mode', dest='mode', type=int,default=1)
-#parser.add_argument('--dir_input', dest='dir_input', default=Path('./images/test/live1_qp10'))
-#parser.add_argument('--dir_label', dest = 'dir_label', default=Path('./images/test/live1_groundtruth'))
-
-
-#args = parser.parse_args()
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts')
+parser.add_argument('--model', dest='model', type = str,default="DnCNN")
+args = parser.parse_args()
 
 
 if __name__ == "__main__":
@@ -44,8 +41,13 @@ if __name__ == "__main__":
     for qulaity in range(0,101,5):
         q_input.append(Path(dir_input, Path('qp'+str(qulaity))))
     
+    if args.model == "DnCNN":
+        model = model_DnCNN.DnCNN()
+    else:
+        print('Error model name!')
+
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
-    ckpt.restore(tf.train.latest_checkpoint(restore_ckptPath)).expect_partial()
+    ckpt.restore(tf.train.latest_checkpoint(args.restore_ckptPath)).expect_partial()
 
 #---------------------------------------------------------------------------------------
     org_psnr = np.zeros(len(filepaths_label))
