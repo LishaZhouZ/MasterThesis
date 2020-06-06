@@ -1,0 +1,80 @@
+2020-06-06 23:31:42.581402: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2020-06-06 23:31:42.659030: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1555] Found device 0 with properties: 
+pciBusID: 0000:3b:00.0 name: TITAN Xp computeCapability: 6.1
+coreClock: 1.582GHz coreCount: 30 deviceMemorySize: 11.91GiB deviceMemoryBandwidth: 510.07GiB/s
+2020-06-06 23:31:42.659358: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-06-06 23:31:42.661892: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-06-06 23:31:42.664046: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2020-06-06 23:31:42.664433: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2020-06-06 23:31:42.666873: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2020-06-06 23:31:42.668205: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2020-06-06 23:31:42.674521: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2020-06-06 23:31:42.679100: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1697] Adding visible gpu devices: 0
+2020-06-06 23:31:42.679591: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2020-06-06 23:31:42.713188: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2100000000 Hz
+2020-06-06 23:31:42.715818: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x56476076e8c0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-06-06 23:31:42.715859: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-06-06 23:31:42.718168: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1555] Found device 0 with properties: 
+pciBusID: 0000:3b:00.0 name: TITAN Xp computeCapability: 6.1
+coreClock: 1.582GHz coreCount: 30 deviceMemorySize: 11.91GiB deviceMemoryBandwidth: 510.07GiB/s
+2020-06-06 23:31:42.718229: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-06-06 23:31:42.718245: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2020-06-06 23:31:42.718260: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2020-06-06 23:31:42.718274: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2020-06-06 23:31:42.718289: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2020-06-06 23:31:42.718303: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2020-06-06 23:31:42.718317: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2020-06-06 23:31:42.720737: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1697] Adding visible gpu devices: 0
+2020-06-06 23:31:42.720785: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-06-06 23:31:42.891060: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1096] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-06-06 23:31:42.891109: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102]      0 
+2020-06-06 23:31:42.891119: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] 0:   N 
+2020-06-06 23:31:42.894823: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1241] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 11439 MB memory) -> physical GPU (device: 0, name: TITAN Xp, pci bus id: 0000:3b:00.0, compute capability: 6.1)
+2020-06-06 23:31:42.900768: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x564760ef5570 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-06-06 23:31:42.900809: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): TITAN Xp, Compute Capability 6.1
+2020-06-06 23:31:47.009645: W tensorflow/core/framework/op_kernel.cc:1655] OP_REQUIRES failed at iterator_ops.cc:941 : Invalid argument: Input to reshape is a tensor with 76800 values, but the requested shape has 19200
+	 [[{{node Reshape_1}}]]
+Initializing from scratch.
+Start of epoch 0
+Traceback (most recent call last):
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/eager/context.py", line 1897, in execution_mode
+    yield
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/data/ops/iterator_ops.py", line 659, in _next_internal
+    output_shapes=self._flat_output_shapes)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/ops/gen_dataset_ops.py", line 2479, in iterator_get_next_sync
+    _ops.raise_from_not_ok_status(e, name)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/framework/ops.py", line 6606, in raise_from_not_ok_status
+    six.raise_from(core._status_to_exception(e.code, message), None)
+  File "<string>", line 3, in raise_from
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Input to reshape is a tensor with 76800 values, but the requested shape has 19200
+	 [[{{node Reshape_1}}]] [Op:IteratorGetNextSync]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "main_run_fire.py", line 70, in <module>
+    fire.Fire(train_process)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/fire/core.py", line 138, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/fire/core.py", line 468, in _Fire
+    target=component.__name__)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/fire/core.py", line 672, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+  File "main_run_fire.py", line 60, in train_process
+    train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager, record_step)
+  File "/home/ge29nab/MasterThesis/train_model.py", line 41, in train_one_epoch
+    for images, labels in dataset:
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/data/ops/iterator_ops.py", line 630, in __next__
+    return self.next()
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/data/ops/iterator_ops.py", line 674, in next
+    return self._next_internal()
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/data/ops/iterator_ops.py", line 665, in _next_internal
+    return structure.from_compatible_tensor_list(self._element_spec, ret)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/contextlib.py", line 130, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/eager/context.py", line 1900, in execution_mode
+    executor_new.wait()
+  File "/home/ge29nab/anaconda3/envs/tf-gpu/lib/python3.7/site-packages/tensorflow_core/python/eager/executor.py", line 67, in wait
+    pywrap_tensorflow.TFE_ExecutorWaitForAllPendingNodes(self._handle)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Input to reshape is a tensor with 76800 values, but the requested shape has 19200
+	 [[{{node Reshape_1}}]]

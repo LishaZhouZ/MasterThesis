@@ -8,10 +8,11 @@ import glob
 from PIL import Image
 import numpy as np
 import math
+import DnCNN_Feature_Attention
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/ckpt-40')
-parser.add_argument('--model', dest='model', type = str,default="DnCNN")
+parser.add_argument('--model', dest='model', type = str,default="DnCNN", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
 
@@ -40,6 +41,8 @@ if __name__ == "__main__":
     
     if args.model == "DnCNN":
         model = model_DnCNN.DnCNN()
+    elif: args.model == "RIDNet"
+	model = DnCNN_Feature_Attention.RIDNet()
     else:
         print('Error model name!')
 

@@ -18,7 +18,7 @@ from config import *
 
 if __name__ == '__main__':
 
-
+    record_step = 1
     #gpus = tf.config.experimental.list_physical_devices('GPU')
     #if gpus:
     #  try:
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     for epoch in range(start_epoch, epochs+1):
         print('Start of epoch %d' % (epoch,))
         optimizer.learning_rate = decay_lr[epoch]
-        train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager)
+        train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager, record_step)
         evaluate_model(model, val_dataset, writer, epoch)
         # save the checkpoint in every epoch
         save_path = manager.save()

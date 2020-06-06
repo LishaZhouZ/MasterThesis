@@ -3,7 +3,6 @@ import numpy as np
 import tensorflow as tf
 #import matplotlib.pyplot as plt
 from model_utility import loss_l1, PSNRMetric, MS_SSIMMetric
-from config import record_step
 import datetime
 
 #with reg loss
@@ -33,7 +32,7 @@ def grad(model, images, labels, optimizer):
 
     return loss_RGB, output
 
-def train_one_epoch(model, dataset, optimizer, writer, ckpt, manager):
+def train_one_epoch(model, dataset, optimizer, writer, ckpt, manager, record_step):
     org_psnr = PSNRMetric()
     opt_psnr = PSNRMetric()
     avg_loss = tf.keras.metrics.Mean()
@@ -54,7 +53,7 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt, manager):
 
         step = ckpt.step.numpy()
         if int(step) % 3000 == 0:
-            save_path = manager.save()
+            save_path = manager.save(checkpoint_number = step)
             print("Saved checkpoint for epoch {}: {}".format(int(step), save_path))
 
         if int(step) % record_step == 0:

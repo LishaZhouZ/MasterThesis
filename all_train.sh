@@ -1,0 +1,1 @@
+nohup python main_run_fire.py --train_dataset_path=/mnt/data4/Students/Lisha/patches_160/train_data.tfrecords --val_dataset_path = /mnt/data4/Students/Lisha/patches_160/train_data.tfrecords --lr=0.001 --ckpt_dir = ./tf_ckpts/ --name=DNCNN_retrain --model_type=DnCNN --batch_size=64 --epochs=45 > nout1.txt

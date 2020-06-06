@@ -7,8 +7,7 @@ import tensorflow as tf
 #import matplotlib.pyplot as plt
 from PIL import Image
 #import IPython.display as display
-from config import batch_size, patch_size
-
+from config import patch_size
 
 def data_augmentation(image, mode):
     if mode == 0:
@@ -56,7 +55,7 @@ def extract_fn(data_record):
     return features['img_bayer'], features['img_label']
 
 
-def read_and_decode(filename):
+def read_and_decode(filename, batch_size):
     #arg_patch_size = tf.constant(patch_size, dtype=tf.int64)
     # read from file path
     raw_image_dataset = tf.data.TFRecordDataset(filename)
