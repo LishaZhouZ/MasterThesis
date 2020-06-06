@@ -3,4 +3,5 @@ images/*
 __pycache__
 logs
 tf_ckpts/*
-nohub.out
+nohup.out
+tf_ckpts*
