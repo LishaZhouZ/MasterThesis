@@ -1,7 +1,9 @@
 import argparse
 from glob import glob
 import datetime
-
+import os
+os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_2 import read_and_decode
@@ -15,22 +17,22 @@ from config import *
 
 
 if __name__ == '__main__':
-    print(tf.executing_eagerly())
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-      try:
-      # Currently, memory growth needs to be the same across GPUs
-        tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-      except RuntimeError as e:
-      # Memory growth must be set before GPUs have been initialized
-          print(e)
 
 
+    #gpus = tf.config.experimental.list_physical_devices('GPU')
+    #if gpus:
+    #  try:
+    #  # Currently, memory growth needs to be the same across GPUs
+    #    tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    #    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    #    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    #  except RuntimeError as e:
+    #  # Memory growth must be set before GPUs have been initialized
+    #      print(e)
+    
     #read dataset /mnt/data4/Students/Lisha/
-    train_dataset = read_and_decode('./patches_MWCNN/MWCNN_train_data_debug.tfrecords')
-    val_dataset = read_and_decode('./patches_MWCNN/MWCNN_validation_data_debug.tfrecords')
+    train_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/train_data.tfrecords')
+    val_dataset = read_and_decode('/mnt/data4/Students/Lisha/patches/validation_data.tfrecords')
     #build model
 
     #set up optimizer
@@ -52,10 +54,10 @@ if __name__ == '__main__':
     for epoch in range(start_epoch, epochs+1):
         print('Start of epoch %d' % (epoch,))
         optimizer.learning_rate = decay_lr[epoch]
-        train_one_epoch(model, train_dataset, optimizer, writer, ckpt)
-        #evaluate_model(model, val_dataset, writer, epoch)
+        train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager)
+        evaluate_model(model, val_dataset, writer, epoch)
         # save the checkpoint in every epoch
-        #save_path = manager.save()
-        #print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
+        save_path = manager.save()
+        print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
 
     print("Training saved")

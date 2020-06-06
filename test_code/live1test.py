@@ -1,36 +1,33 @@
 import sys
-sys.path.insert(1, '../')
+import argparse
 import os
+import timeit
 from pathlib import Path
 import matplotlib.pyplot as plt
 import glob
 from PIL import Image
 import numpy as np
 import math
-import tensorflow as tf
-import timeit
-import model_DnCNN
-import argparse
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/ckpt-40')
 parser.add_argument('--model', dest='model', type = str,default="DnCNN")
+parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
+
+sys.path.insert(1, '../')
+if args.CPU:
+   os.environ['CUDA_VISIBLE_DEVICES'] = "-1"
+else:
+   os.environ['CUDA_VISIABLE_DEVICES'] = "0,1"
+
+
+import tensorflow as tf
+import model_DnCNN
 
 
 if __name__ == "__main__":
-
-    print(tf.executing_eagerly())
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-      try:
-      # Currently, memory growth needs to be the same across GPUs
-        tf.config.experimental.set_visible_devices(gpus[3], 'GPU')
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-      except RuntimeError as e:
-      # Memory growth must be set before GPUs have been initialized
-          print(e)
+    
 
     dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')
     dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100')
@@ -47,7 +44,8 @@ if __name__ == "__main__":
         print('Error model name!')
 
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
-    ckpt.restore(tf.train.latest_checkpoint(args.restore_ckptPath)).expect_partial()
+    ckpt.restore(args.ckptPath)#tf.train.latest_checkpoint(args.restore_ckptPath))
+    print("Successfully restore from %s"%args.restore_ckptPath)
 
 #---------------------------------------------------------------------------------------
     org_psnr = np.zeros(len(filepaths_label))
@@ -57,46 +55,46 @@ if __name__ == "__main__":
     rec_ssim = np.zeros(len(filepaths_label))
     time = np.zeros(len(filepaths_label))
     
-    # for i in range(len(filepaths_label)):
-    #     img_label = Image.open(filepaths_label[i])
-    #     img_input = Image.open(filepaths_input[i])
-         
-    #     a = np.array(img_label, dtype="float32")
-    #     b = np.array(img_input, dtype="float32")
-    #     img_s_label = tf.convert_to_tensor(a)
-    #     img_s_input = tf.convert_to_tensor(b)
-        
-    #     #padding
-    #     shape_input = tf.shape(img_s_input).numpy()
-    #     padding_up = math.ceil(16-shape_input[0]%16/2)
-    #     padding_down = math.floor(16-shape_input[0]%16/2)
-    #     padding_left = math.ceil(16-shape_input[1]%16/2)
-    #     padding_right = math.floor(16-shape_input[1]%16/2)
-    #     paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
+    for q in range(13,14):
+        for i in range(len(filepaths_label)):
 
-    #     img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
+            img_label = Image.open(filepaths_label[i])
+            img_input = Image.open(Path(q_input[q], filenames[i]))
+            a = np.array(img_label, dtype="float32")
+            b = np.array(img_input, dtype="float32")
+            img_s_label = tf.convert_to_tensor(a)
+            img_s_input = tf.convert_to_tensor(b)
 
-    #     img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
-    #     img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
-        
-    #     start = timeit.default_timer()
-        
-    #     output = model(img_s_input_batch, training =False)
-        
-    #     stop = timeit.default_timer()
-    #     time[i] = stop - start
-        
-    #     reconstructed = img_s_input_batch + output
+            #padding
+            shape_input = tf.shape(img_s_input).numpy()
+            padding_up = math.ceil(16-shape_input[0]%16/2)
+            padding_down = math.floor(16-shape_input[0]%16/2)
+            padding_left = math.ceil(16-shape_input[1]%16/2)
+            padding_right = math.floor(16-shape_input[1]%16/2)
+            paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
 
-    #     output_cut = tf.slice(reconstructed, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
+            img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
+
+            img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
+            img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
+
+            start = timeit.default_timer()
+            output = model.predict(img_s_input_batch)
+
+            stop = timeit.default_timer()
+            time[i] = stop - start
+
+            reconstructed = img_s_input_batch + output
+
+            output_cut = tf.slice(reconstructed, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
-    #     org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
-    #     rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
-    #     org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
-    #     rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
-    #     print('Image ' + str(i) + ' org_psnr:%.4f,' % org_psnr[i] + 'after_psnr:%.4f,' % rec_psnr[i], ' org_ssim:%.4f,' % org_ssim[i] + 'after_ssim:%.4f' % rec_ssim[i])
-        
+            org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
+            rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
+            org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
+            rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
+            print('Image ' + str(i) + ' org_psnr:%.4f,' % org_psnr[i] + 'after_psnr:%.4f,' % rec_psnr[i], ' org_ssim:%.4f,' % org_ssim[i] + 'after_ssim:%.4f' % rec_ssim[i])
+
         
     for q in range(len(q_input)):
         for i in range(len(filepaths_label)):
@@ -124,7 +122,7 @@ if __name__ == "__main__":
 
             #start = timeit.default_timer()
 
-            output = model.predict(img_s_input_batch)
+            output = model(img_s_input_batch)
 
             #stop = timeit.default_timer()
             #time[i] = stop - start
@@ -147,5 +145,5 @@ if __name__ == "__main__":
         print('average after_psnr:%.4f' % np.mean(rec_psnr))
         print('average org_ssim:%.4f' % np.mean(org_ssim))
         print('average after_ssim:%.4f' % np.mean(rec_ssim))
-        #print('time %.4f' %np.sum(time))
-        #print('time %.4f' %np.mean(time))
+        print('time %.4f' %np.sum(time))
+        print('time %.4f' %np.mean(time))

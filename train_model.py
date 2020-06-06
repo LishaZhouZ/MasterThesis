@@ -33,7 +33,7 @@ def grad(model, images, labels, optimizer):
 
     return loss_RGB, output
 
-def train_one_epoch(model, dataset, optimizer, writer, ckpt):
+def train_one_epoch(model, dataset, optimizer, writer, ckpt, manager):
     org_psnr = PSNRMetric()
     opt_psnr = PSNRMetric()
     avg_loss = tf.keras.metrics.Mean()
@@ -53,6 +53,10 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt):
         reg_loss(reg_losses)
 
         step = ckpt.step.numpy()
+        if int(step) % 3000 == 0:
+            save_path = manager.save()
+            print("Saved checkpoint for epoch {}: {}".format(int(step), save_path))
+
         if int(step) % record_step == 0:
             avg_relative_psnr = opt_psnr.result() - org_psnr.result()
             print("Step " + str(step) + " loss {:1.2f},".format(avg_loss.result()) 

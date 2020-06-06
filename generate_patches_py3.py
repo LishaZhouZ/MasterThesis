@@ -6,21 +6,24 @@ import random
 import tensorflow as tf
 import time
 from pathlib import Path
-from utils_py3_tfrecord_2 import *
-from config import *
-
+import os
+import numpy as np
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
-parser.add_argument('--step', dest='step', type=int, default=0, help='step, or padding')
-parser.add_argument('--augment', dest='DATA_AUG_TIMES', type=int, default=1, help='data augmentation, used to creat more data')
+parser.add_argument('--stride', dest='stride', type=int, default=160, help='stride')
+parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
+parser.add_argument('--batch_size', dest='batch_size', type=int, default=64, help='DnCNN 64')
+parser.add_argument('--patch_size', dest='patch_size', type=int, default=160, help='DnCNN 160')
+parser.add_argument('--isDebug', dest='isDebug', type=bool, default = False, help='True for 30 images')
+parser.add_argument('--save_dir', dest='save_dir', type=str, default = './', help='save path')
+
 # check output arguments
 args = parser.parse_args()
 
-def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
+def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
     
     filepaths_label = sorted(dir_label.glob('*'))
     
-    if isDebug:
+    if args.isDebug:
         numDebug = 30
         filepaths_label = filepaths_label[:numDebug] # take only ten images to quickly debug
     print("number of training images %d" % len(filepaths_label))
@@ -34,17 +37,17 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     for i in range(len(filepaths_label)):
         img = Image.open(filepaths_label[i])
         im_h, im_w = img.size
-        for x in range(0 + args.step, (im_h - patch_size), args.stride):
-            for y in range(0 + args.step, (im_w - patch_size), args.stride):
+        for x in range(0 + args.step, (im_h - args.patch_size), args.stride):
+            for y in range(0 + args.step, (im_w - args.patch_size), args.stride):
                 count += 1
 
     origin_patch_num = count
-    if origin_patch_num % batch_size != 0:
-        numPatches = 21* int(origin_patch_num / batch_size) * batch_size
+    if origin_patch_num % args.batch_size != 0:
+        numPatches = 21* int(origin_patch_num / args.batch_size) * args.batch_size
     else:
         numPatches = 21* int(origin_patch_num)
 
-    print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, batch_size, numPatches / batch_size))
+    print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, args.batch_size, numPatches / args.batch_size))
     time.sleep(2)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)    
@@ -55,17 +58,17 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
     
     for i in range(len(filepaths_label)):
         print("The %dth image of %d training images" %(i+1, len(filepaths_label)))
-        for q in range(13,14): #len(q_input)
+        for q in range(len(q_input)):#(13,14): #len(q_input)
             img = Image.open(filepaths_label[i])
             img_input = Image.open(Path(q_input[q], filenames[i]))
             img_s = np.array(img, dtype="uint8")
             img_s_input = np.array(img_input, dtype="uint8")
             im_h, im_w, im_c = img_s.shape
 
-            for x in range(0 + args.step, im_h - patch_size, args.stride):
-                for y in range(0 + args.step, im_w - patch_size, args.stride):
-                    image_label = img_s[x:x + patch_size, y:y + patch_size, 0:3]
-                    image_bayer = img_s_input[x:x + patch_size, y:y + patch_size, 0:3]
+            for x in range(0 + args.step, im_h - args.patch_size, args.stride):
+                for y in range(0 + args.step, im_w - args.patch_size, args.stride):
+                    image_label = img_s[x:x + args.patch_size, y:y + args.patch_size, 0:3]
+                    image_bayer = img_s_input[x:x + args.patch_size, y:y + args.patch_size, 0:3]
 
                     image_label = image_label.tobytes()
                     image_bayer = image_bayer.tobytes()
@@ -79,22 +82,22 @@ def generate_patches(dir_label, dir_input, save_dir, isDebug, tfRecord_name):
                     else:
                         break
     writer.close()
-    print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, batch_size, numPatches / batch_size))
+    print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, args.batch_size, numPatches / args.batch_size))
     print("Data has been written into TFrecord.")
 
 if __name__ == '__main__': 
-    src_dir_label = Path("/home/lisha/MasterThesis/images/train/groundtruth")
-    src_dir_input = Path("/home/lisha/MasterThesis/images/train/qp0-100")
-    save_dir = './patches_MWCNN'
-    tfRecord_name = 'MWCNN_train_data_debug.tfrecords'
+    src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
+    src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
+    save_dir = args.save_dir
+    tfRecord_name = 'train_data.tfrecords'
     print("Training data will be generated:")
-    generate_patches(src_dir_label, src_dir_input, save_dir, debug_mode, tfRecord_name)
+    generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 
     #For validation data
-    val_dir_label = Path("/home/lisha/MasterThesis/images/validation/live1_gt")
-    val_dir_input = Path("/home/lisha/MasterThesis/images/validation/live1_0-100")
-    tfRecord_val_name = 'MWCNN_validation_data_debug.tfrecords'
+    val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
+    val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
+    tfRecord_val_name = 'validation_data.tfrecords'
     print("Validation data will be generated:")
-    generate_patches(val_dir_label, val_dir_input, save_dir, debug_mode, tfRecord_val_name)
+    generate_patches(val_dir_label, val_dir_input, save_dir, tfRecord_val_name)
 
 

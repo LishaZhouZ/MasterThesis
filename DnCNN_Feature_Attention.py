@@ -5,7 +5,7 @@ from tensorflow.keras import layers
 import numpy as np
 
 
-batch_size = 32
+batch_size = 64
 patch_size = 80
 class SoftSchrink(tf.keras.layers.Layer):
     def __init__(self):
