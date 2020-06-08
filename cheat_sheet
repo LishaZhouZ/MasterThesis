@@ -1,0 +1,8 @@
+1.change the r/w permission for shell files
+  chmod u+r+x filename.sh
+
+2.nvidia check
+  nvidia-sim
+
+3.check who use the gpu
+  ps -ef | grep python

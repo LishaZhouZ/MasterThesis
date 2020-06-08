@@ -5,3 +5,4 @@ logs
 tf_ckpts/*
 nohup.out
 tf_ckpts*
+nout*
