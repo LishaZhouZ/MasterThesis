@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(1, '../')
+#sys.path.insert(1, '../')
+sys.path.insert(0, '/home/lisha/MasterThesis')
 import argparse
 import os
 import timeit
@@ -12,7 +13,7 @@ import math
 import DnCNN_Feature_Attention
 import pandas as pd
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/Desktop/Link to MasterThesis/tf_ckpts/RIDNet/ckpt-600')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/lisha/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
 parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
@@ -21,7 +22,7 @@ sys.path.insert(1, '../')
 if args.CPU:
    os.environ['CUDA_VISIBLE_DEVICES'] = "-1"
 else:
-   os.environ['CUDA_VISIABLE_DEVICES'] = "0,1"
+   os.environ['CUDA_VISIABLE_DEVICES'] = "0"
 
 
 import tensorflow as tf
@@ -38,8 +39,8 @@ if __name__ == "__main__":
     qtimesum = np.zeros(21)
     qtimemean = np.zeros(21)    
     
-    dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')
-    dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100')
+    dir_label = Path('/home/lisha/MasterThesis/images/validation/live1_gt')
+    dir_input = Path('/home/lisha/MasterThesis/images/validation/live1_0-100')
     
     filepaths_label = sorted(dir_label.glob('*'))
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
@@ -55,7 +56,8 @@ if __name__ == "__main__":
         print('Error model name!')
 
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
-    ckpt.restore(args.restore_ckptPath)#tf.train.latest_checkpoint(args.restore_ckptPath))
+    ckpt.restore(args.restore_ckptPath)
+    #tf.train.latest_checkpoint(args.restore_ckptPath)
     print("Successfully restore from %s"%args.restore_ckptPath)
 
 #---------------------------------------------------------------------------------------
@@ -79,10 +81,10 @@ if __name__ == "__main__":
 
             #padding
             shape_input = tf.shape(img_s_input).numpy()
-            padding_up = math.ceil(16-shape_input[0]%16/2)
-            padding_down = math.floor(16-shape_input[0]%16/2)
-            padding_left = math.ceil(16-shape_input[1]%16/2)
-            padding_right = math.floor(16-shape_input[1]%16/2)
+            padding_up = 6+math.ceil(6-shape_input[0]%6/2)
+            padding_down = 6+math.floor(6-shape_input[0]%6/2)
+            padding_left = 6+math.ceil(6-shape_input[1]%6/2)
+            padding_right = 6+math.floor(6-shape_input[1]%6/2)
             paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
 
             img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
