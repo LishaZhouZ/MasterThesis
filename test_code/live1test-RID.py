@@ -79,10 +79,10 @@ if __name__ == "__main__":
 
             #padding
             shape_input = tf.shape(img_s_input).numpy()
-            padding_up = math.ceil(16-shape_input[0]%16/2)
-            padding_down = math.floor(16-shape_input[0]%16/2)
-            padding_left = math.ceil(16-shape_input[1]%16/2)
-            padding_right = math.floor(16-shape_input[1]%16/2)
+            padding_up = math.ceil(6-shape_input[0]%6/2)
+            padding_down = math.floor(6-shape_input[0]%6/2)
+            padding_left = math.ceil(6-shape_input[1]%6/2)
+            padding_right = math.floor(6-shape_input[1]%6/2)
             paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
 
             img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
@@ -93,6 +93,8 @@ if __name__ == "__main__":
             #start = timeit.default_timer()
 
             output = model(img_s_input_batch)
+	    output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
+
 
             #stop = timeit.default_timer()
             #time[i] = stop - start

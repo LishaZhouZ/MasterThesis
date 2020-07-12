@@ -34,7 +34,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     decay_lr[10:20]= lr/10
     decay_lr[20:30] = lr/100
     decay_lr[30:40]= lr/1000
-    
+    decay_lr[40:50]= lr/10000
     #build model
     if model_type == 'DnCNN':
         model = model_DnCNN.DnCNN()
