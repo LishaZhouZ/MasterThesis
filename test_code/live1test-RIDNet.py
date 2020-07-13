@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, '/home/ge29nab/MasterThesis')
 import argparse
 import os
-#os.environ['CUDA_VISIABLE_DEVICES'] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 import timeit
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -13,24 +13,18 @@ import numpy as np
 import math
 import DnCNN_Feature_Attention
 import pandas as pd
-from tensorflow import config as config
-print("Num GPUs Available: ", len(config.experimental.list_physical_devices('GPU')))
-gpus = config.experimental.list_physical_devices('GPU')
-config.experimental.set_visible_devices(gpus[2], 'GPU')
-logical_gpus = config.experimental.list_logical_devices('GPU')
-print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
+#from tensorflow import config as config
+#print("Num GPUs Available: ", len(config.experimental.list_physical_devices('GPU')))
+#gpus = config.experimental.list_physical_devices('GPU')
+#config.experimental.set_visible_devices(gpus[2], 'GPU')
+#logical_gpus = config.experimental.list_logical_devices('GPU')
+#print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
 parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
-
-#if args.CPU:
-#   os.environ['CUDA_VISIBLE_DEVICES'] = "-1"
-#else:
-#   os.environ['CUDA_VISIABLE_DEVICES'] = "2"
-
 
 import tensorflow as tf
 #import model_DnCNN
@@ -177,4 +171,4 @@ if __name__ == "__main__":
   
     dataCollection = np.vstack((qorg_psnr, qrec_psnr, qorg_ssim, qrec_ssim, qtimesum, qtimemean)).T
     df = pd.DataFrame(dataCollection, columns = ['org_psnr','rec_psnr','org_ssim','rec_ssim','qtimesum','qtimemean'])
-    df.to_csv("ResultRIDNet.xlsx")
+    df.to_csv("ResultRIDNet-CPU.xlsx")

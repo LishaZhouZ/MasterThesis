@@ -2,6 +2,7 @@ import sys
 sys.path.insert(1, '../')
 import argparse
 import os
+#os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 import timeit
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -9,19 +10,20 @@ import glob
 from PIL import Image
 import numpy as np
 import math
-import DnCNN_Feature_Attention
+#import DnCNN_Feature_Attention
 import pandas as pd
+from tensorflow import config as config
+print("Num GPUs Available: ", len(config.experimental.list_physical_devices('GPU')))
+gpus = config.experimental.list_physical_devices('GPU')
+config.experimental.set_visible_devices(gpus[2], 'GPU')
+logical_gpus = config.experimental.list_logical_devices('GPU')
+print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
+
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/Desktop/Link to MasterThesis/tf_ckpts/RIDNet/ckpt-600')
-parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/DNCNN_retrain2/ckpt-89')
+parser.add_argument('--model', dest='model', type = str,default="DnCNN", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
-
-sys.path.insert(1, '../')
-if args.CPU:
-   os.environ['CUDA_VISIBLE_DEVICES'] = "-1"
-else:
-   os.environ['CUDA_VISIABLE_DEVICES'] = "0,1"
 
 
 import tensorflow as tf
@@ -93,7 +95,7 @@ if __name__ == "__main__":
             #start = timeit.default_timer()
 
             output = model(img_s_input_batch)
-	    output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
+            output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
             #stop = timeit.default_timer()
@@ -143,7 +145,6 @@ if __name__ == "__main__":
 
             output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
-
             org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
             rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
             org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
@@ -170,4 +171,4 @@ if __name__ == "__main__":
   
     dataCollection = np.vstack((qorg_psnr, qrec_psnr, qorg_ssim, qrec_ssim, qtimesum, qtimemean)).T
     df = pd.DataFrame(dataCollection, columns = ['org_psnr','rec_psnr','org_ssim','rec_ssim','qtimesum','qtimemean'])
-    df.to_csv("ResultRIDNet.xlsx")
+    df.to_csv("ResultDNCNN_GPU.xlsx")

@@ -2,7 +2,7 @@
   chmod u+r+x filename.sh
 
 2.nvidia check
-  nvidia-sim
+  nvidia-smi
 
 3.check who use the gpu
   ps -ef | grep python
