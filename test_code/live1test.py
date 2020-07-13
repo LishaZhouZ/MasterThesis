@@ -1,6 +1,6 @@
 import sys
 #sys.path.insert(1, '../')
-sys.path.insert(0, '/home/lisha/MasterThesis')
+sys.path.insert(0, '/home/ge29nab/MasterThesis')
 import argparse
 import os
 #os.environ['CUDA_VISIABLE_DEVICES'] = "2"
@@ -17,12 +17,12 @@ import cv2 as cv
 from tensorflow import config as config
 print("Num GPUs Available: ", len(config.experimental.list_physical_devices('GPU')))
 gpus = config.experimental.list_physical_devices('GPU')
-config.experimental.set_visible_devices(gpus[0], 'GPU')
+config.experimental.set_visible_devices(gpus[2], 'GPU')
 logical_gpus = config.experimental.list_logical_devices('GPU')
 print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/lisha/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
 parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
@@ -36,6 +36,14 @@ args = parser.parse_args()
 import tensorflow as tf
 #import model_DnCNN
 
+def imcpsnr(im1, im2, peak=255, b=0):
+    im1 = np.squeeze(im1)
+    im2 = np.squeeze(im2)
+    im1 = im1[b:im1.shape[0]-b, b:im1.shape[1]-b, :]
+    im2 = im2[b:im2.shape[0]-b, b:im2.shape[1]-b, :]
+    mse = ((im1.astype(np.float) - im2.astype(np.float)) ** 2)
+    mse = mse.mean()
+    return 10 * np.log10(255 ** 2 / mse)
 
 if __name__ == "__main__":
 
@@ -47,8 +55,8 @@ if __name__ == "__main__":
     qtimesum = np.zeros(21)
     qtimemean = np.zeros(21)    
     
-    dir_label = Path('/home/lisha/MasterThesis/images/validation/live1_gt')
-    dir_input = Path('/home/lisha/MasterThesis/images/validation/live1_0-100')
+    dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')
+    dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100')
     
     filepaths_label = sorted(dir_label.glob('*'))
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
@@ -80,7 +88,6 @@ if __name__ == "__main__":
         for i in range(len(filepaths_label)):
 
             img_label = cv.imread(str(filepaths_label[i]),1)
-            img_label_ref = Image.open(filepaths_label[i])
             img_input = cv.imread(str(Path(q_input[q], filenames[i])),1)
 
             a = np.array(img_label, dtype="float32")
@@ -111,8 +118,8 @@ if __name__ == "__main__":
             output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
-            org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
-            rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
+            org_psnr[i] = imcpsnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
+            rec_psnr[i] = imcpsnr(output_cut, img_s_label_batch, 255.0)
             org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
             rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
             print('Image ' + str(i) + ' org_psnr:%.4f,' % org_psnr[i] + 'after_psnr:%.4f,' % rec_psnr[i], ' org_ssim:%.4f,' % org_ssim[i] + 'after_ssim:%.4f' % rec_ssim[i])
@@ -153,8 +160,9 @@ if __name__ == "__main__":
             output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
-            org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
-            rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
+            org_psnr[i] = imcpsnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
+            rec_psnr[i] = imcpsnr(output_cut, img_s_label_batch, 255.0)
+
             org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
             rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
             print('Image ' + str(i) + ' org_psnr:%.4f,' % org_psnr[i] + 'after_psnr:%.4f,' % rec_psnr[i], ' org_ssim:%.4f,' % org_ssim[i] + 'after_ssim:%.4f' % rec_ssim[i])
