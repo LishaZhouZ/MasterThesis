@@ -5,7 +5,6 @@ import os
 #os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 import timeit
 from pathlib import Path
-import matplotlib.pyplot as plt
 import glob
 from PIL import Image
 import numpy as np
@@ -20,7 +19,7 @@ logical_gpus = config.experimental.list_logical_devices('GPU')
 print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/DNCNN_retrain2/ckpt-89')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/mnt/data4/Students/Lisha/tf_ckpts/DNCNN_retrain2/ckpt-89')
 parser.add_argument('--model', dest='model', type = str,default="DnCNN", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
@@ -171,4 +170,4 @@ if __name__ == "__main__":
   
     dataCollection = np.vstack((qorg_psnr, qrec_psnr, qorg_ssim, qrec_ssim, qtimesum, qtimemean)).T
     df = pd.DataFrame(dataCollection, columns = ['org_psnr','rec_psnr','org_ssim','rec_ssim','qtimesum','qtimemean'])
-    df.to_csv("ResultDNCNN_GPU.xlsx")
+    df.to_csv("ResultDNCNN_GPU_libjpeg8.xlsx")

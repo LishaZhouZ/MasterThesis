@@ -22,7 +22,7 @@ logical_gpus = config.experimental.list_logical_devices('GPU')
 print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/mnt/data4/Students/Lisha/tf_ckpts/RIDNet/ckpt-600')
 parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()

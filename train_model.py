@@ -52,10 +52,6 @@ def train_one_epoch(model, dataset, optimizer, writer, ckpt, manager, record_ste
         reg_loss(reg_losses)
 
         step = ckpt.step.numpy()
-        if int(step) % 3000 == 0:
-            save_path = manager.save(checkpoint_number = step)
-            print("Saved checkpoint for epoch {}: {}".format(int(step), save_path))
-
         if int(step) % record_step == 0:
             avg_relative_psnr = opt_psnr.result() - org_psnr.result()
             print("Step " + str(step) + " loss {:1.2f},".format(avg_loss.result()) 

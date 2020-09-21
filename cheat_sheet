@@ -6,3 +6,12 @@
 
 3.check who use the gpu
   ps -ef | grep python
+
+4. compile pillow with libjpeg-turbo, also with libjpeg.so.8
+4.1
+conda uninstall -y --force pillow pil jpeg libtiff libjpeg-turbo
+pip   uninstall -y         pillow pil jpeg libtiff libjpeg-turbo
+conda install -yc conda-forge libjpeg-turbo
+CFLAGS="${CFLAGS} -mavx2" pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: --compile pillow-simd
+
+4.2 sudo apt-get install libjpeg62-dev(if don't have admin cannot do it)

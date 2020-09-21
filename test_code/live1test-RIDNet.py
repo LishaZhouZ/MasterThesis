@@ -3,10 +3,9 @@ import sys
 sys.path.insert(0, '/home/ge29nab/MasterThesis')
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 import timeit
 from pathlib import Path
-import matplotlib.pyplot as plt
 import glob
 from PIL import Image
 import numpy as np
@@ -21,7 +20,7 @@ import pandas as pd
 #print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/home/ge29nab/MasterThesis/tf_ckpts/RIDNet/ckpt-600')
+parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/mnt/data4/Students/Lisha/tf_ckpts/RIDNet/ckpt-600')
 parser.add_argument('--model', dest='model', type = str,default="RIDNet", help='RIDNet,DnCNN')
 parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
 args = parser.parse_args()
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     rec_ssim = np.zeros(len(filepaths_label))
     time = np.zeros(len(filepaths_label))
     
-    for q in range(13,14):
+    for q in range(20,21):
         for i in range(len(filepaths_label)):
 
             img_label = Image.open(filepaths_label[i])
@@ -124,10 +123,10 @@ if __name__ == "__main__":
 
             #padding
             shape_input = tf.shape(img_s_input).numpy()
-            padding_up = 6+math.ceil(6-shape_input[0]%6/2)
-            padding_down = 6+math.floor(6-shape_input[0]%6/2)
-            padding_left = 6+math.ceil(6-shape_input[1]%6/2)
-            padding_right = 6+math.floor(6-shape_input[1]%6/2)
+            padding_up = 12+math.ceil(12-shape_input[0]%12/2)
+            padding_down = 12+math.floor(12-shape_input[0]%12/2)
+            padding_left = 12+math.ceil(12-shape_input[1]%12/2)
+            padding_right = 12+math.floor(12-shape_input[1]%12/2)
             paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
 
             img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
@@ -171,4 +170,4 @@ if __name__ == "__main__":
   
     dataCollection = np.vstack((qorg_psnr, qrec_psnr, qorg_ssim, qrec_ssim, qtimesum, qtimemean)).T
     df = pd.DataFrame(dataCollection, columns = ['org_psnr','rec_psnr','org_ssim','rec_ssim','qtimesum','qtimemean'])
-    df.to_csv("ResultRIDNet-CPU.xlsx")
+    df.to_csv("ResultRIDNet-GPU-libjpeg8.xlsx")

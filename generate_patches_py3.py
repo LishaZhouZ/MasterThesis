@@ -9,12 +9,12 @@ from pathlib import Path
 import os
 import numpy as np
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=160, help='stride')
+parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
 parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=64, help='DnCNN 64')
-parser.add_argument('--patch_size', dest='patch_size', type=int, default=160, help='DnCNN 160')
+parser.add_argument('--patch_size', dest='patch_size', type=int, default=80,help='DnCNN 160, MWCNN 256')
 parser.add_argument('--isDebug', dest='isDebug', type=bool, default = False, help='True for 30 images')
-parser.add_argument('--save_dir', dest='save_dir', type=str, default = './', help='save path')
+parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches_80', help='save path')
 
 # check output arguments
 args = parser.parse_args()
@@ -55,21 +55,19 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
 
     writer = tf.io.TFRecordWriter(save_dir + '/' + tfRecord_name)
     # generate patches
-    
     for i in range(len(filepaths_label)):
         print("The %dth image of %d training images" %(i+1, len(filepaths_label)))
-        for q in range(len(q_input)):#(13,14): #len(q_input)
+        
+        for q in range(2,3):#(13,14): #len(q_input)
             img = Image.open(filepaths_label[i])
             img_input = Image.open(Path(q_input[q], filenames[i]))
             img_s = np.array(img, dtype="uint8")
             img_s_input = np.array(img_input, dtype="uint8")
             im_h, im_w, im_c = img_s.shape
-
             for x in range(0 + args.step, im_h - args.patch_size, args.stride):
                 for y in range(0 + args.step, im_w - args.patch_size, args.stride):
                     image_label = img_s[x:x + args.patch_size, y:y + args.patch_size, 0:3]
                     image_bayer = img_s_input[x:x + args.patch_size, y:y + args.patch_size, 0:3]
-
                     image_label = image_label.tobytes()
                     image_bayer = image_bayer.tobytes()
                     count += 1
@@ -89,14 +87,14 @@ if __name__ == '__main__':
     src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
     src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
     save_dir = args.save_dir
-    tfRecord_name = 'train_data.tfrecords'
+    tfRecord_name = 'train_data_q10.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 
     #For validation data
     val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
     val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
-    tfRecord_val_name = 'validation_data.tfrecords'
+    tfRecord_val_name = 'validation_data_q10.tfrecords'
     print("Validation data will be generated:")
     generate_patches(val_dir_label, val_dir_input, save_dir, tfRecord_val_name)
 

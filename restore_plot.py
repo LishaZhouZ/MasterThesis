@@ -8,7 +8,7 @@ from PIL import Image
 import numpy as np
 import math
 
-checkpoint_directory = './tf_ckpts'
+checkpoint_directory = '/mnt/data4/Students/Lisha/tf_ckpts'
 
 def image_cutting(dir_label, dir_input):
     filepaths_label = sorted(dir_label.glob('*'))

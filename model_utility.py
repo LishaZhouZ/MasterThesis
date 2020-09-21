@@ -189,8 +189,8 @@ class MWCNN(tf.keras.Model):
     invcon1 =self.invblock1(invwav2 + con1) #160
     invcon1_retified = self.convlayer12(invcon1)#12
     output = self.invwavelet1(invcon1_retified) #3
-    
-    return output
+    out = output + inputs
+    return out
 
 class MWCNN_m1(tf.keras.Model):
   def __init__(self):
@@ -249,7 +249,8 @@ class MWCNN_m1(tf.keras.Model):
     invcon1_retified = self.convlayer12(invcon1)#12
     invwav1 = self.invwavelet1(invcon1_retified) #3
     
-    output = tf.nn.depth_to_space(invwav1, 2, data_format='NHWC', name=None)
+    output_0 = tf.nn.depth_to_space(invwav1, 2, data_format='NHWC', name=None)
+    output = output_0 + inputs
     return output
     
 class MWCNN_m2(tf.keras.Model):
@@ -318,7 +319,7 @@ class MWCNN_m2(tf.keras.Model):
     
     #combine with the final 
     subband_all = tf.concat([LL1_re, invcon1_retified], 3)
-    output = self.invwavelet1(subband_all) #3
+    output = inputs + self.invwavelet1(subband_all) #3
     
     return output
     

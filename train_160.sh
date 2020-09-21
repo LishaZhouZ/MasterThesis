@@ -1,1 +1,0 @@
-nohup python main_run_fire_160.py --train_dataset_path=/mnt/data4/Students/Lisha/patches_160/train_data.tfrecords --val_dataset_path=/mnt/data4/Students/Lisha/patches_160/validation_data.tfrecords --lr=0.01 --ckpt_dir=./tf_ckpts/ --name=DNCNN_retrain2 --model_type=DnCNN --batch_size=64 --epochs=40 > noutDnCNN2.txt
