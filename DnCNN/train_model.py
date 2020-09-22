@@ -4,7 +4,10 @@ import tensorflow as tf
 #import matplotlib.pyplot as plt
 from model_utility import loss_l2, PSNRMetric, MS_SSIMMetric
 import datetime
-
+from pathlib import Path
+import glob
+from PIL import Image
+import math
 #with reg loss
 #@tf.function
 # def grad(model, images, labels, optimizer):
@@ -79,7 +82,7 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
         ckpt.step.assign_add(1)
 
 
-def evaluate_model(model, test_writer, epoch, dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100/qp10'), 
+def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100/qp10'), 
                 dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')):
 
     filepaths_label = sorted(dir_label.glob('*'))

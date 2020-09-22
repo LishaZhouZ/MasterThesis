@@ -11,10 +11,10 @@ import numpy as np
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
 parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
-parser.add_argument('--batch_size', dest='batch_size', type=int, default=64, help='DnCNN 64')
+parser.add_argument('--batch_size', dest='batch_size', type=int, default=32, help='DnCNN 64')
 parser.add_argument('--patch_size', dest='patch_size', type=int, default=80,help='DnCNN 160, MWCNN 256')
-parser.add_argument('--isDebug', dest='isDebug', type=bool, default = False, help='True for 30 images')
-parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches_80', help='save path')
+parser.add_argument('--isDebug', dest='isDebug', type=bool, default = True, help='True for 30 images')
+parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches', help='save path')
 
 # check output arguments
 args = parser.parse_args()
@@ -24,7 +24,7 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
     filepaths_label = sorted(dir_label.glob('*'))
     
     if args.isDebug:
-        numDebug = 30
+        numDebug = 1000
         filepaths_label = filepaths_label[:numDebug] # take only ten images to quickly debug
     print("number of training images %d" % len(filepaths_label))
     
@@ -92,10 +92,10 @@ if __name__ == '__main__':
     generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 
     #For validation data
-    val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
-    val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
-    tfRecord_val_name = 'validation_data_q10.tfrecords'
-    print("Validation data will be generated:")
-    generate_patches(val_dir_label, val_dir_input, save_dir, tfRecord_val_name)
+    #val_dir_label = Path("/mnt/data4/Students/Lisha/images/validation/live1_gt")
+    #val_dir_input = Path("/mnt/data4/Students/Lisha/images/validation/live1_0-100")
+    #tfRecord_val_name = 'validation_data_q10.tfrecords'
+    #print("Validation data will be generated:")
+    #generate_patches(val_dir_label, val_dir_input, save_dir, tfRecord_val_name)
 
 
