@@ -1,5 +1,4 @@
 import sys
-sys.path.insert(0, '/home/ge29nab/MasterThesis')
 import argparse
 from glob import glob
 import datetime
@@ -18,9 +17,8 @@ import numpy as np
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_256/train_data_256.tfrecords', 
-    val_dataset_path = '/mnt/data4/Students/Lisha/patches_256/validation_data_256.tfrecords', 
-    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='MWCNN_org', model_type = 'MWCNN', batch_size = 32, epochs = 70):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_256.tfrecords', 
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='MWCNN_test', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -28,24 +26,21 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_256/tr
     except:
         pass
     train_dataset = read_and_decode(train_dataset_path, batch_size)
-    val_dataset = read_and_decode(val_dataset_path, batch_size)
-    record_step = 10
+
+    record_step = 1
     ckpt_directory = ckpt_dir + name
     decay_lr = np.ones(epochs+1)
     decay_lr[0:10]= lr
     decay_lr[10:20]= lr/10
     decay_lr[20:30] = lr/100
     decay_lr[30:40]= lr/1000
-    decay_lr[40:50]= lr/10000
-    decay_lr[50:60]= lr/50000
-    decay_lr[60:70]= lr/100000
     #build model
     model = model_utility.MWCNN()
     
     #set up optimizer
     optimizer = tf.optimizers.Adam(learning_rate = lr, epsilon=1e-8, name='AdamOptimizer')
-
-    writer = tf.summary.create_file_writer('/home/ge29nab/MasterThesis/logs/' + name)
+    logdir = '/home/ge29nab/MasterThesis/logs/' + name
+    
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer = optimizer, net = model)
     manager = tf.train.CheckpointManager(ckpt, ckpt_directory, max_to_keep=None)
     
@@ -61,8 +56,8 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_256/tr
     for epoch in range(start_epoch-1, epochs):
         print('Start of epoch %d' % (epoch,))
         optimizer.learning_rate = decay_lr[epoch]
-        train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager, record_step)
-        evaluate_model(model, val_dataset, writer, epoch)
+        train_one_epoch(model, train_dataset, optimizer, logdir, ckpt, manager, record_step)
+        evaluate_model(model, logdir, epoch)
         # save the checkpoint in every epoch
         save_path = manager.save()
         print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
