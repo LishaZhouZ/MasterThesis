@@ -1,5 +1,4 @@
 import sys
-sys.path.insert(1, '/home/ge29nab/MasterThesis/DnCNN')
 import argparse
 import os
 #os.environ["CUDA_VISIBLE_DEVICES"]="-1"
@@ -12,31 +11,27 @@ import math
 #import DnCNN_Feature_Attention
 import pandas as pd
 
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('--ckptPath', dest='restore_ckptPath', type=str,default='/mnt/data4/Students/Lisha/tf_ckpts/DnCNN_test')
-parser.add_argument('--CPU', dest='CPU', type = bool, default = False)
-args = parser.parse_args()
 
 
 import tensorflow as tf
 import model_DnCNN
 
-
-def check():
+def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth'), 
+        dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
+        logdir = '/home/ge29nab/MasterThesis/logs/', 
+        ckptdir= '/mnt/data4/Students/Lisha/tf_ckpts/DnCNN_test/',
+        name='DnCNN_test'):
     
-    dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
-    dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10')
+    #variants
+    model = model_DnCNN.DnCNN()
+    numDebug = 1000
     
     filepaths_label = sorted(dir_label.glob('*'))
-    numDebug = 1000
     filepaths_label = filepaths_label[:numDebug]
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
 
-    model = model_DnCNN.DnCNN()
-
-    
-    train_writer = tf.summary.create_file_writer('/home/ge29nab/MasterThesis/logs/DnCNN_test/train')
-    original_writer = tf.summary.create_file_writer('/home/ge29nab/MasterThesis/logs/DnCNN_test/original')
+    train_writer = tf.summary.create_file_writer( logdir + name + '/train')
+    original_writer = tf.summary.create_file_writer(logdir + name + '/original')
 #---------------------------------------------------------------------------------------
     org_psnr = np.zeros(len(filepaths_label))
     rec_psnr = np.zeros(len(filepaths_label))
@@ -45,7 +40,7 @@ def check():
     rec_ssim = np.zeros(len(filepaths_label))
 
     for epoch in range(0,40):
-        ckptPath = '/mnt/data4/Students/Lisha/tf_ckpts/DnCNN_test/ckpt-'+str(epoch + 1)
+        ckptPath = ckptdir + 'ckpt-'+ str(epoch + 1)
         ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
         ckpt.restore(ckptPath)#tf.train.latest_checkpoint(args.restore_ckptPath))
         print("Successfully restore from %s"%ckptPath)
