@@ -18,9 +18,8 @@ import numpy as np
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_80/train_data.tfrecords', 
-    val_dataset_path = '/mnt/data4/Students/Lisha/patches_80/validation_data.tfrecords', 
-    lr = 0.0001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='RIDNet', model_type = 'RIDNet', batch_size = 64, epochs = 70):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_256.tfrecords', 
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/' , name='RIDNet',  batch_size = 64, epochs = 40 ):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -34,22 +33,16 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_80/tra
     decay_lr[0:10]= lr
     decay_lr[10:20]= lr/10
     decay_lr[20:30] = lr/100
-    decay_lr[30:40]= lr/1000
-    decay_lr[40:50]= lr/10000
-    decay_lr[50:60]= lr/50000
-    decay_lr[60:70]= lr/100000
+    decay_lr[30:41]= lr/1000
+
     #build model
-    if model_type == 'DnCNN':
-        model = model_DnCNN.DnCNN()
-    elif model_type == 'RIDNet':
-        model = DnCNN_Feature_Attention.RIDNet()
-    else:
-        print(error)
+    model = DnCNN_Feature_Attention.RIDNet()
+
     
     #set up optimizer
     optimizer = tf.optimizers.Adam(learning_rate = lr, epsilon=1e-8, name='AdamOptimizer')
-
-    writer = tf.summary.create_file_writer('/home/ge29nab/MasterThesis/logs/' + name)
+    logdir = '/home/ge29nab/MasterThesis/logs/' + name
+ 
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer = optimizer, net = model)
     manager = tf.train.CheckpointManager(ckpt, ckpt_directory, max_to_keep=None)
     
@@ -57,7 +50,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_80/tra
     ckpt.restore(manager.latest_checkpoint).expect_partial()
     if manager.latest_checkpoint:
         print("Restored from {}".format(manager.latest_checkpoint))
-        start_epoch = 41  #ckpt.save_counter.numpy() + 1
+        start_epoch = ckpt.save_counter.numpy() + 1 #ckpt.save_counter.numpy() + 1
     else:
         print("Initializing from scratch.")
         start_epoch = 1
@@ -65,8 +58,8 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_80/tra
     for epoch in range(start_epoch-1, epochs):
         print('Start of epoch %d' % (epoch,))
         optimizer.learning_rate = decay_lr[epoch]
-        train_one_epoch(model, train_dataset, optimizer, writer, ckpt, manager, record_step)
-        evaluate_model(model, val_dataset, writer, epoch)
+        train_one_epoch(model, train_dataset, optimizer, logdir, ckpt, manager, record_step)
+        evaluate_model(model, logdir, epoch)
         # save the checkpoint in every epoch
         save_path = manager.save()
         print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))

@@ -33,7 +33,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     decay_lr[0:10]= lr
     decay_lr[10:20]= lr/10
     decay_lr[20:30] = lr/100
-    decay_lr[30:40]= lr/1000
+    decay_lr[30:41]= lr/1000
     #build model
     model = model_utility.MWCNN()
     
