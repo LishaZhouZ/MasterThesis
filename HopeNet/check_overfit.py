@@ -17,10 +17,10 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
         dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
         logdir = '/home/ge29nab/MasterThesis/logs/', 
         ckptdir= '/mnt/data4/Students/Lisha/tf_ckpts/',
-        name='MWCNN_m1_test'):
+        name='HopeNet_test'):
     
     #variants
-    model = model_utility.MWCNN_m1()
+    model = model_utility.HopeNet()
     
     filepaths_label = sorted(dir_label.glob('*'))
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
