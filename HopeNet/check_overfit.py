@@ -1,7 +1,7 @@
 import sys
 import argparse
 import os
-#os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 import timeit
 from pathlib import Path
 import glob
@@ -11,13 +11,14 @@ import math
 #import DnCNN_Feature_Attention
 import pandas as pd
 import tensorflow as tf
+import model_utility
 #import model_DnCNN
 
 def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth'), 
         dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
         logdir = '/home/ge29nab/MasterThesis/logs/', 
         ckptdir= '/mnt/data4/Students/Lisha/tf_ckpts/',
-        name='HopeNet_test'):
+        name='HopeNet'):
     
     #variants
     model = model_utility.HopeNet()
@@ -37,15 +38,16 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
     for epoch in range(0,40):
         ckptPath = ckptdir + name + '/ckpt-'+ str(epoch + 1)
         ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
-        ckpt.restore(ckptPath)#tf.train.latest_checkpoint(args.restore_ckptPath))
+        ckpt.restore(ckptPath).expect_partial() #tf.train.latest_checkpoint(args.restore_ckptPath))
         print("Successfully restore from %s"%ckptPath)
         for i in range(len(filepaths_label)):
 
             img_label = Image.open(filepaths_label[i])
+
             img_input = Image.open(Path(dir_input, filenames[i]))
             a = np.array(img_label, dtype="float32")
             b = np.array(img_input, dtype="float32")
-            img_s_label = tf.convert_to_tensor(a)
+            img_s_label = tf.convert_to_tensor(a[:,:,0:3])
             img_s_input = tf.convert_to_tensor(b)
             #padding
             shape_input = tf.shape(img_s_input).numpy()

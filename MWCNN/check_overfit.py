@@ -1,7 +1,7 @@
 import sys
 import argparse
 import os
-#os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 import timeit
 from pathlib import Path
 import glob
@@ -11,7 +11,7 @@ import math
 #import DnCNN_Feature_Attention
 import pandas as pd
 import tensorflow as tf
-#import model_DnCNN
+import model_utility
 
 def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth'), 
         dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
@@ -45,7 +45,7 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
             img_input = Image.open(Path(dir_input, filenames[i]))
             a = np.array(img_label, dtype="float32")
             b = np.array(img_input, dtype="float32")
-            img_s_label = tf.convert_to_tensor(a)
+            img_s_label = tf.convert_to_tensor(a[:,:,0:3])
             img_s_input = tf.convert_to_tensor(b)
             #padding
             shape_input = tf.shape(img_s_input).numpy()
