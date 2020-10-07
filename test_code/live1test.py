@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
             #start = timeit.default_timer()
 
-            output = model(img_s_input_batch)
+            output = model(img_s_input_batch, training=False)
 
             #stop = timeit.default_timer()
             #time[i] = stop - start
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
             start = timeit.default_timer()
 
-            output = model(img_s_input_batch)
+            output = model(img_s_input_batch, training=False)
 
             stop = timeit.default_timer()
             time[i] = stop - start

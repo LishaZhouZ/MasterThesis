@@ -59,7 +59,6 @@ class WaveletConvLayer(tf.keras.layers.Layer):
     super(WaveletConvLayer, self).__init__()
 
   def call(self, inputs):
-    inputs = inputs/4
     im_c1 = inputs[:, 0::2, 0::2, :] # 1
     im_c2 = inputs[:, 0::2, 1::2, :] # right up
     im_c3 = inputs[:, 1::2, 0::2, :] # left down
@@ -78,7 +77,7 @@ class WaveletInvLayer(tf.keras.layers.Layer):
 
   def call(self, inputs):
     sz = inputs.shape
-    inputs = inputs/2
+    inputs = inputs/4
     a = tf.cast(sz[3]/4, tf.int32)
     LL = inputs[:, :, :, 0:a]
     LH = inputs[:, :, :, a:2*a]

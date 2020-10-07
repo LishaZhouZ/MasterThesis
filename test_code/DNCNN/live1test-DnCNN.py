@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
             #start = timeit.default_timer()
 
-            output = model(img_s_input_batch)
+            output = model(img_s_input_batch, training=False)
             output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
             start = timeit.default_timer()
 
-            output = model(img_s_input_batch)
+            output = model(img_s_input_batch, training=False)
 
             stop = timeit.default_timer()
             time[i] = stop - start

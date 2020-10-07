@@ -5,12 +5,12 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_80 import read_and_decode
 from train_model import train_one_epoch, evaluate_model
-import DnCNN_Feature_Attention
+import models
 import fire
 import numpy as np
 import check_overfit
@@ -20,7 +20,7 @@ import check_overfit
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_80.tfrecords', 
-    lr = 0.0001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='KaiNet_test_80', batch_size = 32, epochs = 40):
+    lr = 0.1, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -36,7 +36,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     decay_lr[20:30] = lr/100
     decay_lr[30:41]= lr/1000
     
-    model = DnCNN_Feature_Attention.KaiNet()
+    model = models.TestNet()
     
 
     #set up optimizer
@@ -64,7 +64,6 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
         save_path = manager.save()
         print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
         
-    check_overfit.check()
     print("Training saved")
     return
 

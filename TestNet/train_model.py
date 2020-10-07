@@ -30,9 +30,7 @@ def grad(model, images, labels, optimizer):
         output = model(images, training=True)
         #reconstructed = tf.clip_by_value(images + output, clip_value_min=0., clip_value_max=255.)
         loss_RGB = loss_l2(output, labels)
-        reg_losses = tf.math.add_n(model.losses)
-        total_loss = loss_RGB + reg_losses
-    grads = tape.gradient(total_loss, model.trainable_weights)
+    grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
     return loss_RGB, output
@@ -120,7 +118,7 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
         img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
         
-        output = model(img_s_input_batch)
+        output = model(img_s_input_batch, training=False)
         
         output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 

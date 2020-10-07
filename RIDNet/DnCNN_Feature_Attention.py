@@ -162,7 +162,7 @@ class RIDNet(tf.keras.Model):
     eam2 = self.EAM2(eam1)
     eam3 = self.EAM3(eam2)
     eamOut = self.EAM4(eam3)
-    
+
     res = self.tail(eamOut)
     #add mean
     post = self.add_mean(res)
@@ -170,74 +170,3 @@ class RIDNet(tf.keras.Model):
     out = post + input
 
     return out
-
-class AWNet(tf.keras.Model):
-  def __init__(self):
-    super(AWNet, self).__init__()
-    self.my_initial = tf.initializers.glorot_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
-    self.feature_num = 64
-
-    self.head = layers.Conv2D(self.feature_num, (3,3), activation = 'relu', padding = 'SAME',
-            kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)# 
-    self.tail = layers.Conv2D(3, (3,3), padding = 'SAME',
-            kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)# 
-
-    self.EAM1 = EAMBlock(256, self.my_initial, self.my_regular)
-    self.EAM2 = EAMBlock(1024, self.my_initial, self.my_regular)
-    self.EAM3 = EAMBlock(256, self.my_initial, self.my_regular)
-    
-    self.EAM4 = EAMBlock(256, self.my_initial, self.my_regular)
-    self.EAM5 = EAMBlock(64, self.my_initial, self.my_regular)
-    
-    #wavelet layer
-    self.wavelet1 = WaveletConvLayer()
-    self.wavelet2 = WaveletConvLayer()
-    self.wavelet3 = WaveletConvLayer()
-    
-    self.invwavelet1 = WaveletInvLayer()
-    self.invwavelet2 = WaveletInvLayer()
-    self.invwavelet3 = WaveletInvLayer()
-    self.convlayer1024 = layers.Conv2D(1024, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-    self.convlayer640 = layers.Conv2D(640, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial,kernel_regularizer = self.my_regular)
-    self.convlayer64 = layers.Conv2D(64, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-
-    self.rgb_mean = np.array([0.4488, 0.4371, 0.4040])
-    self.rgb_std = np.array([1.0, 1.0, 1.0])
-    self.rgb_range = 255.0
-
-    self.sub_mean = MeanShift(self.rgb_range, self.rgb_mean, self.rgb_std)       
-    self.add_mean = MeanShift(self.rgb_range, self.rgb_mean, self.rgb_std, 1)
-
-  def call(self, input, training=False):
-    #sub mean
-    pre = self.sub_mean(input)
-    #fist layer
-    start = self.head(pre)      #3-64
-    wav1 = self.wavelet1(start)  #64-256
-    eam1 = self.EAM1(wav1)       #256 - 256
-
-    wav2 = self.wavelet2(eam1)   #256-1024
-    eam2 = self.EAM2(wav2)      #1024-1024
-    
-#    wav3 = self.wavelet3(eam2)  #256-1024
-#    eam3 = self.EAM3(wav3)      #1024-256
-#    eam3_expand = self.convlayer1024(eam3) #-1024
-    
-    invwav3 = self.invwavelet3(eam2) #1024-256
-    eam4 = self.EAM4(invwav3+eam1)  #256-256
-    #eam4_expand = self.convlayer640(eam4) #256-640
-
-    invwav2 = self.invwavelet2(eam4) #256-64
-    eam5 = self.EAM5(invwav2 + start) #64
-
-#    eam5_rectified = self.convlayer64(eam5) #160-64
-    #invwav1 = self.invwavelet1(eam5)
-
-    res = self.tail(eam5)
-    #add mean
-    post = self.add_mean(res)
-    return post

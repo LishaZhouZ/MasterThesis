@@ -62,7 +62,7 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
             img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
             img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
             #start = timeit.default_timer()
-            output = model(img_s_input_batch)
+            output = model(img_s_input_batch, training=False)
             output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
             org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()

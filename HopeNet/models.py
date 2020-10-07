@@ -1,5 +1,6 @@
-from model_utility import WaveletConvLayer, WaveletInvLayer, ConvBlock10, ConvConcatLayer
+from model_utility import WaveletConvLayer, WaveletInvLayer, ConvBlock10, ConvConcatLayer, ConvBlock
 import tensorflow as tf
+from tensorflow.keras import layers
 class HopeNet(tf.keras.Model):
   def __init__(self):
     super(HopeNet, self).__init__()
@@ -11,12 +12,13 @@ class HopeNet(tf.keras.Model):
     self. conv10c = ConvBlock10(64, (3,3), self.my_initial, self.my_regular)
     self. conv10d = ConvBlock10(64, (3,3), self.my_initial, self.my_regular)
 
-    self.before = ConvConcatLayer(120, (3,3), self.my_initial, self.my_regular)
-    self.after = ConvConcatLayer(120, (3,3), self.my_initial, self.my_regular)
     #wavelet part
     self.wavelet = WaveletConvLayer()
 
     self.invwavelet = WaveletInvLayer()
+    self. conv_after = ConvBlock(64, (3,3), self.my_initial, self.my_regular)
+    self.tail = layers.Conv2D(12, (3,3), padding = 'SAME',
+                kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)# 
 
   
   def call(self, inputs):
@@ -39,7 +41,9 @@ class HopeNet(tf.keras.Model):
     post_HH = HH + conHH
 
     resultInter = tf.concat([post_LL, post_LH, post_HL, post_HH], 3)
-
-    invwav = self.invwavelet(resultInter) 
-    return invwav
+    conv = self.conv_after(resultInter)
+    tail = self.tail(conv)
+    invwav = self.invwavelet(tail) 
+    out = inputs+invwav
+    return out
     
