@@ -122,6 +122,33 @@ class ConvBlock(layers.Layer):
     a14 = self.alpha4(a13)
     return a14
 
+class ConvBlock10(layers.Layer):
+  def __init__(self, feature_num, kernel_size, my_initial, my_regular):
+    super(ConvBlock10, self).__init__()
+    self.alpha1 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha2 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha3 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha4 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha5 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha6 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha7 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha8 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha9 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha10 = ConvConcatLayer(3, kernel_size, my_initial, my_regular)
+
+  def call(self, inputs):
+    a11 = self.alpha1(inputs)
+    a12 = self.alpha2(a11)
+    a13 = self.alpha3(a12)
+    a14 = self.alpha4(a13)
+    a15 = self.alpha5(a14)
+    a16 = self.alpha6(a15)
+    a17 = self.alpha7(a16)
+    a18 = self.alpha8(a17)
+    a19 = self.alpha9(a18)
+    a20 = self.alpha10(a19)
+    return a20
+
 class ConvInvBlock(layers.Layer):
   def __init__(self, feature_num1, kernel_size, my_initial, my_regular):
     super(ConvInvBlock, self).__init__()
@@ -134,55 +161,4 @@ class ConvInvBlock(layers.Layer):
     a12 = self.alpha2(a11)
     a13 = self.alpha3(a12)
     return a13
-
-class HopeNet(tf.keras.Model):
-  def __init__(self):
-    super(HopeNet, self).__init__()
-    self.my_initial = tf.initializers.he_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
-
-    self.convblock_LL = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    self.convblock_HL = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    self.convblock_LH = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    self.convblock_HH = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    
-    self.invConvblock_LL = ConvBlock(3, (3,3), self.my_initial, self.my_regular)
-    self.invConvblock_HL = ConvBlock(3, (3,3), self.my_initial, self.my_regular)
-    self.invConvblock_LH = ConvBlock(3, (3,3), self.my_initial, self.my_regular)
-    self.invConvblock_HH = ConvBlock(3, (3,3), self.my_initial, self.my_regular)
-
-    #wavelet part
-    self.wavelet = WaveletConvLayer()
-
-    self.invwavelet = WaveletInvLayer()
-
-  
-  def call(self, inputs):
-
-    wav = self.wavelet(inputs)  #
-    # seperate to LL and HL,LH,HH part
-    LL = wav[:, :, :, 0:3]
-    LH = wav[:, :, :, 3:6]
-    HL = wav[:, :, :, 6:9]
-    HH = wav[:, :, :, 9:12]
-
-    #with LL only apply one 4-FCN layers
-    conLL = self.convblock_LL(LL)
-    invConLL = self.invConvblock_LL(conLL)
-
-    conLH = self.convblock_LH(LH)
-    invConLH = self.invConvblock_LH(conLH)
-
-    conHL = self.convblock_HL(HL)
-    invConHL = self.invConvblock_HL(conHL)
-    
-    conHH = self.convblock_HH(HH)
-    invConHH = self.invConvblock_HH(conHH)
-
-    resultInter = tf.concat([invConLL, invConLH, invConHL, invConHH], 3)
-    invwav = self.invwavelet(resultInter)  #1024-256
-    
-    output = invwav + inputs
-    return output
-    
 

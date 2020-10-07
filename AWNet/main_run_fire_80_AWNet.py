@@ -20,7 +20,7 @@ import check_overfit
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_80.tfrecords', 
-    lr = 0.0001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='AWNet_test', batch_size = 32, epochs = 40):
+    lr = 0.0001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='AWNet_test_80', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)

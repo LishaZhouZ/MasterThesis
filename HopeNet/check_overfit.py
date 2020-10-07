@@ -1,7 +1,7 @@
 import sys
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="3"
 import timeit
 from pathlib import Path
 import glob
@@ -18,12 +18,13 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
         dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
         logdir = '/home/ge29nab/MasterThesis/logs/', 
         ckptdir= '/mnt/data4/Students/Lisha/tf_ckpts/',
-        name='HopeNet'):
+        name='HopeNet_80'):
     
     #variants
     model = model_utility.HopeNet()
-    
+    numDebug = 1000
     filepaths_label = sorted(dir_label.glob('*'))
+    filepaths_label = filepaths_label[:numDebug]
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
 
     train_writer = tf.summary.create_file_writer( logdir + name + '/train')

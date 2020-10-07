@@ -175,7 +175,7 @@ class AWNet(tf.keras.Model):
   def __init__(self):
     super(AWNet, self).__init__()
     self.my_initial = tf.initializers.glorot_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
+    self.my_regular = tf.keras.regularizers.l2(l=1)
     self.feature_num = 64
 
     self.head = layers.Conv2D(self.feature_num, (3,3), activation = 'relu', padding = 'SAME',

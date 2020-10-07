@@ -74,7 +74,7 @@ def save_images(filepath, ground_truth, noisy_image=None, clean_image=None):
     # ground_truth = np.squeeze(ground_truth)
     # noisy_image = np.squeeze(noisy_image)
     # clean_image = np.squeeze(clean_image)
-    if not clean_image.any():
+    if not clean_image.any()
         cat_image = ground_truth
     else:
         cat_image = np.concatenate(

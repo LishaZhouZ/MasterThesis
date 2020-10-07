@@ -9,11 +9,11 @@ from pathlib import Path
 import os
 import numpy as np
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=112, help='stride')
+parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
 parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=32, help='DnCNN 64')
-parser.add_argument('--patch_size', dest='patch_size', type=int, default=256,help='DnCNN 160, MWCNN 256')
-parser.add_argument('--isDebug', dest='isDebug', type=bool, default = False, help='True for 30 images')
+parser.add_argument('--patch_size', dest='patch_size', type=int, default=80,help='DnCNN 160, MWCNN 256')
+parser.add_argument('--isDebug', dest='isDebug', type=bool, default =True, help='True for 30 images')
 parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches', help='save path')
 
 # check output arguments
@@ -24,7 +24,7 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
     filepaths_label = sorted(dir_label.glob('*'))
     
     if args.isDebug:
-        numDebug = 2000
+        numDebug = 1000
         filepaths_label = filepaths_label[:numDebug] # take only ten images to quickly debug
     print("number of training images %d" % len(filepaths_label))
     
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
     src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
     save_dir = args.save_dir
-    tfRecord_name = 'train_data_q10_256.tfrecords'
+    tfRecord_name = 'train_data_q10_80.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 

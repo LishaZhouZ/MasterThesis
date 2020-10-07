@@ -3,7 +3,7 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_80 import read_and_decode
@@ -16,8 +16,8 @@ from check_overfit import check
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10.tfrecords', 
-    lr = 0.0001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='DnCNN_test', batch_size = 32, epochs = 40):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_80.tfrecords', 
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='DnCNN_test', batch_size = 32, epochs = 40):
     train_dataset = read_and_decode(train_dataset_path, batch_size)
     record_step = 1
     ckpt_directory = ckpt_dir + name

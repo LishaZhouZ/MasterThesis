@@ -1,0 +1,1 @@
+nohup python main_run_fire_80.py --train_dataset_path=/mnt/data4/Students/Lisha/patches_80/train_data.tfrecords --val_dataset_path=/mnt/data4/Students/Lisha/patches_80/validation_data.tfrecords --lr=0.0001 --ckpt_dir=./tf_ckpts/ --name=RIDNet --model_type=RIDNet --batch_size=64 --epochs=40 > noutRIDNet.txt
