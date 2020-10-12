@@ -59,7 +59,7 @@ class WaveletConvLayer(tf.keras.layers.Layer):
     super(WaveletConvLayer, self).__init__()
 
   def call(self, inputs):
-    #inputs = inputs/4
+    inputs = inputs/2
     im_c1 = inputs[:, 0::2, 0::2, :] # 1
     im_c2 = inputs[:, 0::2, 1::2, :] # right up
     im_c3 = inputs[:, 1::2, 0::2, :] # left down
@@ -78,7 +78,7 @@ class WaveletInvLayer(tf.keras.layers.Layer):
 
   def call(self, inputs):
     sz = inputs.shape
-    inputs = inputs/4
+    inputs = inputs/2
     a = tf.cast(sz[3]/4, tf.int32)
     LL = inputs[:, :, :, 0:a]
     LH = inputs[:, :, :, a:2*a]
@@ -134,7 +134,7 @@ class ConvBlock10(layers.Layer):
     self.alpha7 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
     self.alpha8 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
     self.alpha9 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
-    self.alpha10 = ConvConcatLayer(3, kernel_size, my_initial, my_regular)
+    self.alpha10 = layers.Conv2D(3, kernel_size, padding = 'SAME', kernel_initializer=my_initial, kernel_regularizer=my_regular)
 
   def call(self, inputs):
     a11 = self.alpha1(inputs)

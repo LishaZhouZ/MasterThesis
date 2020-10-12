@@ -1,33 +1,34 @@
 import sys
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import timeit
 from pathlib import Path
 import glob
 from PIL import Image
 import numpy as np
 import math
-#import DnCNN_Feature_Attention
 import pandas as pd
 import tensorflow as tf
 import model_utility
+import models
 #import model_DnCNN
 
 def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth'), 
         dir_input = Path('/mnt/data4/Students/Lisha/images/train/qp0-100/qp10'), 
         logdir = '/home/ge29nab/MasterThesis/logs/', 
         ckptdir= '/mnt/data4/Students/Lisha/tf_ckpts/',
-        name='HopeNet'):
+        name='TestNet'):
     
     #variants
-    model = model_utility.HopeNet()
+    model = models.TestNet()
     numDebug = 1000
     filepaths_label = sorted(dir_label.glob('*'))
     filepaths_label = filepaths_label[:numDebug]
+
     filenames = [item.name[0:-4] + '.jpg' for item in filepaths_label]
 
-    train_writer = tf.summary.create_file_writer( logdir + name + '/train')
+    train_writer = tf.summary.create_file_writer( logdir + name + '/train_1000')
     original_writer = tf.summary.create_file_writer(logdir + name + '/original')
 #---------------------------------------------------------------------------------------
     org_psnr = np.zeros(len(filepaths_label))
@@ -36,7 +37,7 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
     org_ssim = np.zeros(len(filepaths_label))
     rec_ssim = np.zeros(len(filepaths_label))
 
-    for epoch in range(0,40):
+    for epoch in range(8,40):
         ckptPath = ckptdir + name + '/ckpt-'+ str(epoch + 1)
         ckpt = tf.train.Checkpoint(step=tf.Variable(1), net = model)
         ckpt.restore(ckptPath).expect_partial() #tf.train.latest_checkpoint(args.restore_ckptPath))
@@ -52,10 +53,10 @@ def check(dir_label = Path('/mnt/data4/Students/Lisha/images/train/groundtruth')
             img_s_input = tf.convert_to_tensor(b)
             #padding
             shape_input = tf.shape(img_s_input).numpy()
-            padding_up = math.ceil(16-shape_input[0]%16/2)
-            padding_down = math.floor(16-shape_input[0]%16/2)
-            padding_left = math.ceil(16-shape_input[1]%16/2)
-            padding_right = math.floor(16-shape_input[1]%16/2)
+            padding_up = math.ceil(48-shape_input[0]%48/2)
+            padding_down = math.floor(48-shape_input[0]%48/2)
+            padding_left = math.ceil(48-shape_input[1]%48/2)
+            padding_right = math.floor(48-shape_input[1]%48/2)
             paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
             img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
             img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)

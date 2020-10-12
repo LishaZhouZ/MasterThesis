@@ -5,7 +5,8 @@ class TestNet(tf.keras.Model):
     def __init__(self):
         super(TestNet, self).__init__()
         self.my_initial = tf.initializers.he_normal()
-        self.my_regular = tf.keras.regularizers.l2(l=0.0005)
+        
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
         self.feature_num = 64
 
         self.wavelet = WaveletConvLayer()

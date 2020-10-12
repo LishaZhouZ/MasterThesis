@@ -9,10 +9,10 @@ from pathlib import Path
 import os
 import numpy as np
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
+parser.add_argument('--stride', dest='stride', type=int, default=128, help='stride')
 parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=32, help='DnCNN 64')
-parser.add_argument('--patch_size', dest='patch_size', type=int, default=80,help='DnCNN 160, MWCNN 256')
+parser.add_argument('--patch_size', dest='patch_size', type=int, default=128,help='DnCNN 160, MWCNN 256')
 parser.add_argument('--isDebug', dest='isDebug', type=bool, default =True, help='True for 30 images')
 parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches', help='save path')
 
@@ -24,7 +24,7 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
     filepaths_label = sorted(dir_label.glob('*'))
     
     if args.isDebug:
-        numDebug = 1000
+        numDebug = 4000
         filepaths_label = filepaths_label[:numDebug] # take only ten images to quickly debug
     print("number of training images %d" % len(filepaths_label))
     
@@ -61,6 +61,7 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
         for q in range(2,3):#(13,14): #len(q_input)
             img = Image.open(filepaths_label[i])
             img_input = Image.open(Path(q_input[q], filenames[i]))
+            print(q_input[q])
             img_s = np.array(img, dtype="uint8")
             img_s_input = np.array(img_input, dtype="uint8")
             im_h, im_w, im_c = img_s.shape
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
     src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
     save_dir = args.save_dir
-    tfRecord_name = 'train_data_q10_80.tfrecords'
+    tfRecord_name = 'aa.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 

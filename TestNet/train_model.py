@@ -28,7 +28,6 @@ import math
 def grad(model, images, labels, optimizer):
     with tf.GradientTape() as tape:
         output = model(images, training=True)
-        #reconstructed = tf.clip_by_value(images + output, clip_value_min=0., clip_value_max=255.)
         loss_RGB = loss_l2(output, labels)
     grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
@@ -45,7 +44,7 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
     train_writer = tf.summary.create_file_writer(logdir + "/train")
     
 
-    for images, labels in dataset:
+    for images, labels in dataset.take(800):
         loss_RGB, reconstructed = grad(model, images, labels, optimizer)
         #loss_RGB, reg_losses, total_loss, reconstructed = grad(model, images, labels, optimizer)
         reg_losses = tf.math.add_n(model.losses)

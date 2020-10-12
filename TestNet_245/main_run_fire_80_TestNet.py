@@ -1,4 +1,5 @@
 import sys
+#sys.path.insert(0, '/home/ge29nab/MasterThesis')
 import argparse
 from glob import glob
 import datetime
@@ -13,18 +14,20 @@ import models
 import fire
 import numpy as np
 import check_overfit
+
 #weigth decay momentum optimizer
 #L2 regularization
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_80.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='HopeNet', batch_size = 32, epochs = 40):
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_80', batch_size = 32, epochs = 10):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
     except:
         pass
     train_dataset = read_and_decode(train_dataset_path, batch_size)
+
     record_step = 1
     ckpt_directory = ckpt_dir + name
     decay_lr = np.ones(epochs+1)
@@ -32,12 +35,13 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     decay_lr[10:20]= lr/10
     decay_lr[20:30] = lr/100
     decay_lr[30:41]= lr/1000
-
-    #build model
-    model = models.HopeNet()
     
+    model = models.TestNet()
+    
+
     #set up optimizer
     optimizer = tf.optimizers.Adam(learning_rate = lr, epsilon=1e-8, name='AdamOptimizer')
+
     logdir = '/home/ge29nab/MasterThesis/logs/' + name
     ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer = optimizer, net = model)
     manager = tf.train.CheckpointManager(ckpt, ckpt_directory, max_to_keep=None)
@@ -59,8 +63,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
         # save the checkpoint in every epoch
         save_path = manager.save()
         print("Saved checkpoint for epoch {}: {}".format(int(epoch), save_path))
-    
-    check_overfit.check()
+        
     print("Training saved")
     return
 

@@ -28,7 +28,6 @@ import math
 def grad(model, images, labels, optimizer):
     with tf.GradientTape() as tape:
         output = model(images, training=True)
-        #reconstructed = tf.clip_by_value(images + output, clip_value_min=0., clip_value_max=255.)
         loss_RGB = loss_l2(output, labels)
     grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
@@ -45,7 +44,7 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
     train_writer = tf.summary.create_file_writer(logdir + "/train")
     
 
-    for images, labels in dataset:
+    for images, labels in dataset.take(800):
         loss_RGB, reconstructed = grad(model, images, labels, optimizer)
         #loss_RGB, reg_losses, total_loss, reconstructed = grad(model, images, labels, optimizer)
         reg_losses = tf.math.add_n(model.losses)
@@ -102,7 +101,7 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
          
         a = np.array(img_label, dtype="float32")
         b = np.array(img_input, dtype="float32")
-        img_s_label = tf.convert_to_tensor(a)
+        img_s_label = tf.convert_to_tensor(a[:,:,0:3])
         img_s_input = tf.convert_to_tensor(b)
         
         #padding
@@ -118,7 +117,7 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
         img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
         
-        output = model(img_s_input_batch, training = False)
+        output = model(img_s_input_batch, training=False)
         
         output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
