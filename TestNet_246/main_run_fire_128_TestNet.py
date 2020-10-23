@@ -8,19 +8,18 @@ os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import tensorflow as tf
 import math
-from utils_py3_tfrecord_80 import read_and_decode
+from utils_py3_tfrecord_128 import read_and_decode
 from train_model import train_one_epoch, evaluate_model
 import models
 import fire
 import numpy as np
-import check_overfit
 
 #weigth decay momentum optimizer
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_80.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_80', batch_size = 32, epochs = 40):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_128.tfrecords', 
+    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_128_HL', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -31,12 +30,11 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     record_step = 1
     ckpt_directory = ckpt_dir + name
     decay_lr = np.ones(epochs+1)
-    decay_lr[0:10]= lr
-    decay_lr[10:20]= lr/10
-    decay_lr[20:30] = lr/100
-    decay_lr[30:41]= lr/1000
+    decay_lr[0:20]= lr
+    decay_lr[20:30]= lr/10
+    decay_lr[30:41] = lr/100
     
-    model = models.TestNet()
+    model = models.TestNet2()
     
 
     #set up optimizer

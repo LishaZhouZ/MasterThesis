@@ -30,7 +30,7 @@ def grad(model, images, labels, optimizer):
     with tf.GradientTape() as tape:
         output = model(images, training=True)
         label_wav = wav(labels)
-        label_wav2 = label_wav[:, :, :, 0:3]
+        label_wav2 = label_wav[:, :, :, 9:12]
         loss_RGB = loss_l2(output, label_wav2)
     grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
@@ -55,10 +55,10 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
         
         wav = WaveletConvLayer()
         label_wav = wav(labels)
-        label_wav2 = label_wav[:, :, :, 0:3]
+        label_wav2 = label_wav[:, :, :, 9:12]
 
         input_wav = wav(images)
-        input_wav2 = input_wav[:, :, :, 0:3]
+        input_wav2 = input_wav[:, :, :, 9:12]
 
         org_psnr(input_wav2, label_wav2)
         opt_psnr(reconstructed, label_wav2)
@@ -116,10 +116,10 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
         #padding
         shape_input = tf.shape(img_s_input).numpy()
-        padding_up = math.ceil(4-shape_input[0]%4/2)
-        padding_down = math.floor(4-shape_input[0]%4/2)
-        padding_left = math.ceil(4-shape_input[1]%4/2)
-        padding_right = math.floor(4-shape_input[1]%4/2)
+        padding_up = math.ceil(2-shape_input[0]%2/2)
+        padding_down = math.floor(2-shape_input[0]%2/2)
+        padding_left = math.ceil(2-shape_input[1]%2/2)
+        padding_right = math.floor(2-shape_input[1]%2/2)
         paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
 
         img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
@@ -130,10 +130,10 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
         wav = WaveletConvLayer()
         label_wav = wav(img_s_label_batch)
-        label_wav2 = label_wav[:, :, :, 0:3]
+        label_wav2 = label_wav[:, :, :, 9:12]
         
         input_wav = wav(img_s_input_batch)
-        input_wav2 = input_wav[:, :, :, 0:3]
+        input_wav2 = input_wav[:, :, :, 9:12]
 
         output = model(img_s_input_batch, training=False)
 

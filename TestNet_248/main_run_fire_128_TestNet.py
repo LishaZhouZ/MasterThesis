@@ -5,7 +5,7 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_128 import read_and_decode
@@ -14,13 +14,12 @@ import models
 import fire
 import numpy as np
 
-
 #weigth decay momentum optimizer
 #L2 regularization
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_128.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_128_LL22', batch_size = 32, epochs = 40):
+    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_128_HH', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)

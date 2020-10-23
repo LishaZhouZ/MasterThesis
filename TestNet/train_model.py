@@ -2,7 +2,7 @@ import time
 import numpy as np
 import tensorflow as tf
 #import matplotlib.pyplot as plt
-from model_utility import loss_l2, PSNRMetric, MS_SSIMMetric
+from model_utility import loss_l2, PSNRMetric, MS_SSIMMetric, WaveletConvLayer
 import datetime
 from pathlib import Path
 import glob
@@ -106,23 +106,23 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
         #padding
         shape_input = tf.shape(img_s_input).numpy()
-        padding_up = math.ceil(16-shape_input[0]%16/2)
-        padding_down = math.floor(16-shape_input[0]%16/2)
-        padding_left = math.ceil(16-shape_input[1]%16/2)
-        padding_right = math.floor(16-shape_input[1]%16/2)
+        padding_up = math.ceil(2-shape_input[0]%2/2)
+        padding_down = math.floor(2-shape_input[0]%2/2)
+        padding_left = math.ceil(2-shape_input[1]%2/2)
+        padding_right = math.floor(2-shape_input[1]%2/2)
         paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
-
+        
         img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
 
         img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
         img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
         
-        output = model(img_s_input_batch, training=False)
+        output = model(img_s_input_batch)
         
         output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
 
-        org_psnr[i] = tf.image.psnr(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0).numpy()
+        org_psnr[i] = tf.image.psnr(img_s_label, img_s_input, 255.0).numpy()
         rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
         org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
         rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
@@ -139,5 +139,3 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
  
     
-
-

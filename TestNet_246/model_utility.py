@@ -134,8 +134,8 @@ class ConvBlock10(layers.Layer):
     self.alpha7 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
     self.alpha8 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
     self.alpha9 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
-    self.alpha10 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
-  
+    self.alpha10 = layers.Conv2D(3, kernel_size, padding = 'SAME', kernel_initializer=my_initial, kernel_regularizer=my_regular)
+
   def call(self, inputs):
     a11 = self.alpha1(inputs)
     a12 = self.alpha2(a11)

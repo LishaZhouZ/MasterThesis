@@ -14,13 +14,12 @@ import models
 import fire
 import numpy as np
 
-
 #weigth decay momentum optimizer
 #L2 regularization
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_128.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_128_LL22', batch_size = 32, epochs = 40):
+    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='TestNet_128_HL2', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
