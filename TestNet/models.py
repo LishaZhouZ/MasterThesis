@@ -84,3 +84,42 @@ class TestNet2(tf.keras.Model):
         out = self.invwavelet(combined)
 
         return out
+
+class TestNet_LL(tf.keras.Model):
+    def __init__(self):
+        super(TestNet_LL, self).__init__()
+        self.my_initial = tf.initializers.he_uniform()
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+        self.feature_num = 64
+        self.wav = WaveletConvLayer()
+        self. conv10a = ConvBlock10(64, (3,3), self.my_initial, self.my_regular)
+        self.conv1 = layers.Conv2D(3, (3,3), padding = 'SAME', kernel_initializer=self.my_initial, kernel_regularizer=self.my_regular)
+
+    def call(self, input):
+        #kkeyi 
+        af = self.wav(input)
+        LL_conv = self.conv10a(af)
+        afterLL = self.conv1(LL_conv)
+        post_LL = af[:,:,:,0:3] + afterLL
+
+        return post_LL
+
+class TestNet_LLHH(tf.keras.Model):
+    def __init__(self):
+        super(TestNet_LLHH, self).__init__()
+        self.my_initial = tf.initializers.he_uniform()
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+        self.feature_num = 64
+
+        self.wave = WaveletConvLayer()
+        self. conv10b = ConvBlock10(64, (3,3), self.my_initial, self.my_regular)
+        self.conv2 = layers.Conv2D(9, (3,3), padding = 'SAME', kernel_initializer=self.my_initial, kernel_regularizer=self.my_regular)
+
+    def call(self, input):
+        af= self.wave(input)
+        LLH_conv = self.conv10b(af)        
+        afterLLH = self.conv2(LLH_conv)
+
+        post_LLH = af[:,:,:,3:12] + afterLLH
+
+        return post_LLH
