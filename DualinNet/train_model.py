@@ -26,12 +26,9 @@ import math
 # without reg loss
 @tf.function
 def grad(model, images, labels, optimizer):
-    wav = WaveletConvLayer()
     with tf.GradientTape() as tape:
         output = model(images, training=True)
-        label_wav = wav(labels)
-        label_wav2 = label_wav[:, :, :, 9:12]
-        loss_RGB = loss_l2(output, label_wav2)
+        loss_RGB = loss_l2(output, labels)
     grads = tape.gradient(loss_RGB, model.trainable_weights)
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
 
@@ -52,16 +49,9 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
         #loss_RGB, reg_losses, total_loss, reconstructed = grad(model, images, labels, optimizer)
         reg_losses = tf.math.add_n(model.losses)
         total_loss = loss_RGB + reg_losses
-        
-        wav = WaveletConvLayer()
-        label_wav = wav(labels)
-        label_wav2 = label_wav[:, :, :, 9:12]
 
-        input_wav = wav(images)
-        input_wav2 = input_wav[:, :, :, 9:12]
-
-        org_psnr(input_wav2, label_wav2)
-        opt_psnr(reconstructed, label_wav2)
+        org_psnr(images, labels)
+        opt_psnr(reconstructed, labels)
         #avg_loss(loss_RGB)
         avg_loss(total_loss)
         rgb_loss(loss_RGB)
@@ -94,6 +84,7 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
 def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/Lisha/images/validation/live1_0-100/qp10'), 
                 dir_label = Path('/mnt/data4/Students/Lisha/images/validation/live1_gt')):
 
+    pad = 16
     filepaths_label = sorted(dir_label.glob('*'))
     filepaths_input = sorted(dir_input.glob('*'))
 
@@ -116,33 +107,26 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
         #padding
         shape_input = tf.shape(img_s_input).numpy()
-        padding_up = math.ceil(2-shape_input[0]%2/2)
-        padding_down = math.floor(2-shape_input[0]%2/2)
-        padding_left = math.ceil(2-shape_input[1]%2/2)
-        padding_right = math.floor(2-shape_input[1]%2/2)
+        padding_up = math.ceil(pad-shape_input[0]%pad/2)
+        padding_down = math.floor(pad-shape_input[0]%pad/2)
+        padding_left = math.ceil(pad-shape_input[1]%pad/2)
+        padding_right = math.floor(pad-shape_input[1]%pad/2)
         paddings = tf.constant([[padding_up, padding_down,], [padding_left, padding_right], [0, 0]])
-
+        
         img_s_input_padded = tf.pad(img_s_input, paddings, "REFLECT")
-        img_s_label_padded = tf.pad(img_s_label, paddings, "REFLECT")
 
         img_s_input_batch = tf.expand_dims(img_s_input_padded, axis = 0)
-        img_s_label_batch = tf.expand_dims(img_s_label_padded, axis = 0)
+        img_s_label_batch = tf.expand_dims(img_s_label, axis = 0)
         
-        wav = WaveletConvLayer()
-        label_wav = wav(img_s_label_batch)
-        label_wav2 = label_wav[:, :, :, 9:12]
-        
-        input_wav = wav(img_s_input_batch)
-        input_wav2 = input_wav[:, :, :, 9:12]
-
         output = model(img_s_input_batch, training=False)
+        
+        output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])
 
-        #output_cut = tf.slice(output, [0, padding_up, padding_left, 0], [1, shape_input[0], shape_input[1], 3])        
 
-        org_psnr[i] = tf.image.psnr(label_wav2, input_wav2, 255.0).numpy()
-        rec_psnr[i] = tf.image.psnr(output, label_wav2, 255.0).numpy()
-        org_ssim[i] = tf.image.ssim_multiscale(label_wav2, input_wav2, 255.0)
-        rec_ssim[i] = tf.image.ssim_multiscale(output, label_wav2, 255.0)
+        org_psnr[i] = tf.image.psnr(img_s_label, img_s_input, 255.0).numpy()
+        rec_psnr[i] = tf.image.psnr(output_cut, img_s_label_batch, 255.0).numpy()
+        org_ssim[i] = tf.image.ssim_multiscale(img_s_label_batch, tf.expand_dims(img_s_input, axis = 0), 255.0)
+        rec_ssim[i] = tf.image.ssim_multiscale(output_cut, img_s_label_batch, 255.0)
     
     print("Epoch " + str(epoch) + " val_psnr {:1.5f},".format(rec_psnr.mean())
                             + " org_psnr {:1.5f},".format(org_psnr.mean())
@@ -156,5 +140,3 @@ def evaluate_model(model, logdir, epoch, dir_input = Path('/mnt/data4/Students/L
         
  
     
-
-

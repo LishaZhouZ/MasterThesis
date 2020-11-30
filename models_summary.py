@@ -1,8 +1,4 @@
-from model_utility import ConvBlock10, WaveletInvLayer, WaveletConvLayer, ConvBlock
-from DnCNN_Feature_Attention import EAMBlock, MergeAndRun
-import tensorflow as tf
-from tensorflow.keras import layers
-
+#Parallel Inception(changes in MergeAnd Run, normal is not with resInRes, another is with resInRes)
 class TestNetInception(tf.keras.Model):
     def __init__(self):
         super(TestNetInception, self).__init__()
@@ -45,6 +41,7 @@ class TestNetInception(tf.keras.Model):
         out = input + out_
         return out
 
+#EAM without FA, changes made in EAM block
 class TestNetAbl(tf.keras.Model):
     def __init__(self):
         super(TestNetAbl, self).__init__()
@@ -144,3 +141,6 @@ class TestNet4(tf.keras.Model):
         out_ = self.invwavelet(after)
         out = input + out_
         return out
+
+
+#

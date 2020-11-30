@@ -73,9 +73,7 @@ class MergeAndRun(layers.Layer):
         Merge = tf.concat([out1, out2], 3)
         out3 = self.convCombined(Merge)
 
-        #changes only for check inception model
         out = out3 + input
-        
         return out
 
 class ResidualBlock(layers.Layer):
@@ -107,7 +105,7 @@ class EResidualBlock(layers.Layer):
     def call(self, input):
         out1 = self.conv1(input)
         out2 = self.conv2(out1)
-        out3 = self.conv3(out2)
+        out3 = self.conv2(out2)
         # add together first then relu
         out4 = tf.nn.relu(out3 + input)
 
@@ -119,14 +117,14 @@ class EAMBlock(layers.Layer):
         self.r1 = MergeAndRun(feature_num, my_initial, my_regular)
         self.r2 = ResidualBlock(feature_num, my_initial, my_regular)
         self.r3 = EResidualBlock(feature_num, my_initial, my_regular)
-        #self.fe = FeatureAttention(feature_num, my_initial, my_regular)
+        self.fe = FeatureAttention(feature_num, my_initial, my_regular)
     
     def call(self, input):
         r1 = self.r1(input)
         r2 = self.r2(r1)
         r3 = self.r3(r2)
-        #out = self.fe(r3)
-        return r3
+        out = self.fe(r3)
+        return out
 
 
 
