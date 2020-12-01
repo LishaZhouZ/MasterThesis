@@ -44,7 +44,7 @@ def train_one_epoch(model, dataset, optimizer, logdir, ckpt, manager, record_ste
     train_writer = tf.summary.create_file_writer(logdir + "/train")
     
 
-    for images, labels in dataset.take(800):
+    for images, labels in dataset:
         loss_RGB, reconstructed = grad(model, images, labels, optimizer)
         #loss_RGB, reg_losses, total_loss, reconstructed = grad(model, images, labels, optimizer)
         reg_losses = tf.math.add_n(model.losses)

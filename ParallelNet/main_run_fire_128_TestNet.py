@@ -5,7 +5,7 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_128 import read_and_decode
@@ -17,8 +17,8 @@ import numpy as np
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_128.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='ParallelNet', batch_size = 32, epochs = 40):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_128/train_data_q10.tfrecords', 
+    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='ParallelNet_fm96_6', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -33,7 +33,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_
     decay_lr[20:30]= lr/10
     decay_lr[30:41] = lr/100
     
-    model = models.ParallelNet()
+    model = models.ParallelNet_6()
     
 
     #set up optimizer
