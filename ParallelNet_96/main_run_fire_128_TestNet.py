@@ -18,7 +18,7 @@ import numpy as np
 #tensorboard
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_128/train_data_q10.tfrecords', 
-    lr = 0.01, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='ParallelNet_fm96_5', batch_size = 32, epochs = 40):
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='wavNet_2conv', batch_size = 32, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
@@ -33,7 +33,7 @@ def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_128/tr
     decay_lr[20:30]= lr/10
     decay_lr[30:41] = lr/100
     
-    model = models.ParallelNet_5()
+    model = models.ParallelNet_1()
     
 
     #set up optimizer

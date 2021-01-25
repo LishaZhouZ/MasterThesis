@@ -100,12 +100,15 @@ class ConvConcatLayer(layers.Layer):
         kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
     self.bn = layers.BatchNormalization()
     self.relu = layers.ReLU()
+    self.conv2 = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
+        kernel_initializer=my_initial,kernel_regularizer=my_regular)#
   
   def call(self, inputs):
     a = self.conv(inputs)
     b = self.bn(a)
     c = self.relu(b)
-    return c
+    d = self.conv2(c)
+    return d
 
 class ConvBlock(layers.Layer):
   def __init__(self, feature_num, kernel_size, my_initial, my_regular):

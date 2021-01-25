@@ -135,192 +135,30 @@ class ConvInvBlock(layers.Layer):
     a13 = self.alpha3(a12)
     return a13
 
-class MWCNN(tf.keras.Model):
-  def __init__(self):
-    super(MWCNN, self).__init__()
-    self.my_initial = tf.initializers.he_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
-    
-    self.convblock1 = ConvBlock(160, (3,3), self.my_initial, self.my_regular)
-    self.convblock2 = ConvBlock(256, (3,3), self.my_initial, self.my_regular)
-    self.convblock3 = ConvBlock(256, (3,3), self.my_initial, self.my_regular)
 
-    self.invblock2 = ConvInvBlock(256, (3,3), self.my_initial, self.my_regular)
-    self.invblock1 = ConvInvBlock(160, (3,3), self.my_initial, self.my_regular)
-    
-    self.wavelet1 = WaveletConvLayer()
-    self.wavelet2 = WaveletConvLayer()
-    self.wavelet3 = WaveletConvLayer()
-    
-    self.invwavelet1 = WaveletInvLayer()
-    self.invwavelet2 = WaveletInvLayer()
-    self.invwavelet3 = WaveletInvLayer()
-
-    self.convlayer1024 = layers.Conv2D(1024, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-    self.convlayer640 = layers.Conv2D(640, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial,kernel_regularizer = self.my_regular)
-    self.convlayer12 = layers.Conv2D(12, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
+class ConvBlock10(layers.Layer):
+  def __init__(self, feature_num, kernel_size, my_initial, my_regular):
+    super(ConvBlock10, self).__init__()
+    self.alpha1 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha2 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha3 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha4 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha5 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha6 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha7 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha8 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha9 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha10 = ConvConcatLayer(feature_num, kernel_size, my_initial, my_regular)
   
   def call(self, inputs):
-    
-    #former side
-    wav1 = self.wavelet1(inputs)  #3-12
-    con1 = self.convblock1(wav1)  #12-160
-    
-    #2
-    wav2 = self.wavelet2(con1)   #160-640
-    con2 = self.convblock2(wav2) #640-256
-
-    #3
-    wav3 = self.wavelet3(con2)   #256-1024
-    con3 = self.convblock3(wav3)  #1024-256
-    invcon3_expand = self.convlayer1024(con3) #256-1024
-
-    invwav3 = self.invwavelet3(invcon3_expand)  #1024-256
-    
-    #2
-    invcon2 = self.invblock2(invwav3 + con2) #256
-    invcon2_expand = self.convlayer640(invcon2)#640
-    invwav2 = self.invwavelet2(invcon2_expand) #160
-
-    #1
-    invcon1 =self.invblock1(invwav2 + con1) #160
-    invcon1_retified = self.convlayer12(invcon1)#12
-    output = self.invwavelet1(invcon1_retified) #3
-    out = output + inputs
-    return out
-
-class MWCNN_m1(tf.keras.Model):
-  def __init__(self):
-    super(MWCNN_m1, self).__init__()
-    self.my_initial = tf.initializers.he_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
-    
-    self.convblock1 = ConvBlock(160, (3,3), self.my_initial, self.my_regular)
-    self.convblock2 = ConvBlock(256, (3,3), self.my_initial, self.my_regular)
-    self.convblock3 = ConvBlock(256, (3,3), self.my_initial, self.my_regular)
-
-    self.invblock2 = ConvInvBlock(256, (3,3), self.my_initial, self.my_regular)
-    self.invblock1 = ConvInvBlock(160, (3,3), self.my_initial, self.my_regular)
-    
-    self.wavelet1 = WaveletConvLayer()
-    self.wavelet2 = WaveletConvLayer()
-    self.wavelet3 = WaveletConvLayer()
-    
-    self.invwavelet1 = WaveletInvLayer()
-    self.invwavelet2 = WaveletInvLayer()
-    self.invwavelet3 = WaveletInvLayer()
-
-    self.convlayer1024 = layers.Conv2D(1024, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-    self.convlayer640 = layers.Conv2D(640, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial,kernel_regularizer = self.my_regular)
-    self.convlayer12 = layers.Conv2D(48, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-  
-  def call(self, inputs):
-
-    input_arranged = tf.nn.space_to_depth(inputs, 2, data_format='NHWC', name=None)
-    
-    #former side
-    wav1 = self.wavelet1(input_arranged)  #3-12
-    con1 = self.convblock1(wav1)  #12-160
-    
-    #2
-    wav2 = self.wavelet2(con1)   #160-640
-    con2 = self.convblock2(wav2) #640-256
-
-    #3
-    wav3 = self.wavelet3(con2)   #256-1024
-    con3 = self.convblock3(wav3)  #1024-256
-    invcon3_expand = self.convlayer1024(con3) #256-1024
-
-    invwav3 = self.invwavelet3(invcon3_expand)  #1024-256
-    
-    #2
-    invcon2 = self.invblock2(invwav3 + con2) #256
-    invcon2_expand = self.convlayer640(invcon2)#640
-    invwav2 = self.invwavelet2(invcon2_expand) #160
-
-    #1
-    invcon1 =self.invblock1(invwav2 + con1) #160
-    invcon1_retified = self.convlayer12(invcon1)#12
-    invwav1 = self.invwavelet1(invcon1_retified) #3
-    
-    output_0 = tf.nn.depth_to_space(invwav1, 2, data_format='NHWC', name=None)
-    output = output_0 + inputs
-    return output
-    
-class MWCNN_m2(tf.keras.Model):
-  def __init__(self):
-    super(MWCNN_m2, self).__init__()
-    self.my_initial = tf.initializers.he_normal()
-    self.my_regular = tf.keras.regularizers.l2(l=0.0001)
-
-    self.convblock1_LL = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    self.convblock1 = ConvBlock(120, (3,3), self.my_initial, self.my_regular)
-    self.convblock2 = ConvBlock(192, (3,3), self.my_initial, self.my_regular)
-    self.convblock3 = ConvBlock(192, (3,3), self.my_initial, self.my_regular)
-
-    self.invblock2 = ConvInvBlock(192, (3,3), self.my_initial, self.my_regular)
-    self.invblock1 = ConvInvBlock(120, (3,3), self.my_initial, self.my_regular)
-    
-    self.wavelet1 = WaveletConvLayer()
-    self.wavelet2 = WaveletConvLayer()
-    self.wavelet3 = WaveletConvLayer()
-    
-    self.invwavelet1 = WaveletInvLayer()
-    self.invwavelet2 = WaveletInvLayer()
-    self.invwavelet3 = WaveletInvLayer()
-
-    self.convlayer512 = layers.Conv2D(768, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-    self.convlayer320 = layers.Conv2D(480, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial,kernel_regularizer = self.my_regular)
-    self.convlayer8 = layers.Conv2D(8, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-    self.convlayer4 = layers.Conv2D(4, (3,3), padding = 'SAME',
-        kernel_initializer = self.my_initial, kernel_regularizer = self.my_regular)
-  
-  def call(self, inputs):
-
-    wav1 = self.wavelet1(inputs)  #
-    # seperate to LL and HL,LH,HH part
-    LL1 = wav1[:, :, :, 0:4]
-    H_1 = wav1[:, :, :, 4:12]
-
-    #with LL only apply one 4-FCN layers
-    conLL1 = self.convblock1_LL(LL1)
-    LL1_re=self.convlayer4(conLL1)
-
-    #with fined details apply the original-like structure
-    conH_1 = self.convblock1(H_1)
-    #2
-    wav2 = self.wavelet2(conH_1)   #160-640
-    con2 = self.convblock2(wav2) #640-256
-
-    #3
-    wav3 = self.wavelet3(con2)   #256-1024
-    con3 = self.convblock3(wav3)  #1024-256
-    invcon3_expand = self.convlayer512(con3) #256-1024
-
-    invwav3 = self.invwavelet3(invcon3_expand)  #1024-256
-    
-    #2
-    invcon2 = self.invblock2(invwav3 + con2) #256
-    invcon2_expand = self.convlayer320(invcon2)#640
-    invwav2 = self.invwavelet2(invcon2_expand) #160
-
-    #1
-    invcon1 =self.invblock1(invwav2 + conH_1) #160
-    invcon1_retified = self.convlayer8(invcon1)#12
-    
-    #combine with the final 
-    subband_all = tf.concat([LL1_re, invcon1_retified], 3)
-    output = inputs + self.invwavelet1(subband_all) #3
-    
-    return output
-    
-
+    a11 = self.alpha1(inputs)
+    a12 = self.alpha2(a11)
+    a13 = self.alpha3(a12)
+    a14 = self.alpha4(a13)
+    a15 = self.alpha5(a14)
+    a16 = self.alpha6(a15)
+    a17 = self.alpha7(a16)
+    a18 = self.alpha8(a17)
+    a19 = self.alpha9(a18)
+    a20 = self.alpha10(a19)
+    return a20

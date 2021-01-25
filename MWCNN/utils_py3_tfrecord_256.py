@@ -8,7 +8,7 @@ import tensorflow as tf
 from PIL import Image
 #import IPython.display as display
 
-patch_size = 256
+patch_size = 128
 def data_augmentation(image, mode):
     if mode == 0:
         # original

@@ -4,7 +4,7 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_256 import read_and_decode
@@ -17,14 +17,10 @@ import numpy as np
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_256.tfrecords', 
-    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='MWCNN_test', batch_size = 32, epochs = 40):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_128/train_1184iter64bz.tfrecords', 
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='MWCNN_MIDTERN', batch_size = 64, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
-    try:
-        tf.config.experimental.set_memory_growth(gpus[0], True)
-        tf.config.experimental.set_memory_growth(gpus[1], True)
-    except:
-        pass
+
     train_dataset = read_and_decode(train_dataset_path, batch_size)
 
     record_step = 1

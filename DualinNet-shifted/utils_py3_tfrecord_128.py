@@ -63,7 +63,7 @@ def read_and_decode(filename, batch_size):
     # extract the data from raw image
     #200 batch size 8 -- 101M RAM
     #100 batch sizz 8 -- 64M RAM
-    raw_image_dataset = raw_image_dataset.shuffle(5000)
+    raw_image_dataset = raw_image_dataset.shuffle(3000)
     # order is important
     raw_image_dataset = raw_image_dataset.map(extract_fn)
     raw_image_dataset = raw_image_dataset.batch(batch_size)

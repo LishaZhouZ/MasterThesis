@@ -19,7 +19,7 @@ from check_overfit import check
 
 def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_256.tfrecords', 
     lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='MWCNN_m1_test', batch_size = 32, epochs = 40):
-    gpus = tf.config.list_physical_devices('GPU')
+    gpus = tf.config.list_physical_devices('GPU')l
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)
         tf.config.experimental.set_memory_growth(gpus[1], True)

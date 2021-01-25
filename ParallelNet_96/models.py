@@ -74,6 +74,90 @@ class ParallelNet_5(tf.keras.Model):
         out = input + out_
         return out
 
+class ParallelNet_3(tf.keras.Model):
+    def __init__(self):
+        super(ParallelNet_3, self).__init__()
+        self.my_initial = tf.initializers.he_uniform()
+        
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+
+        self.wavelet = WaveletConvLayer()
+        self.invwavelet = WaveletInvLayer()
+        
+        self. conv10a = ConvBlock10(96, (3,3), self.my_initial, self.my_regular)
+        self. conv10b = ConvBlock10(96, (3,3), self.my_initial, self.my_regular)
+        self. conv10c = ConvBlock10(96, (3,3), self.my_initial, self.my_regular)
+
+
+        self.conv1 = layers.Conv2D(12, (3,3), padding = 'SAME', kernel_initializer=self.my_initial, kernel_regularizer=self.my_regular)
+
+    def call(self, input):
+        wav= self.wavelet(input)
+
+        aa = self.conv10a(wav)
+        bb = self.conv10b(wav)
+        cc = self.conv10c(wav)
+
+        combined = tf.concat([aa, bb, cc], 3)
+        after = self.conv1(combined)
+        out_ = self.invwavelet(after)
+        out = input + out_
+        return out
+
+
+class ParallelNet_2(tf.keras.Model):
+    def __init__(self):
+        super(ParallelNet_2, self).__init__()
+        self.my_initial = tf.initializers.he_uniform()
+        
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+
+        self.wavelet = WaveletConvLayer()
+        self.invwavelet = WaveletInvLayer()
+        
+        self. conv10a = ConvBlock10(96, (3,3), self.my_initial, self.my_regular)
+        self. conv10b = ConvBlock10(96, (3,3), self.my_initial, self.my_regular)
+
+        self.conv1 = layers.Conv2D(12, (3,3), padding = 'SAME', kernel_initializer=self.my_initial, kernel_regularizer=self.my_regular)
+
+    def call(self, input):
+        wav= self.wavelet(input)
+
+        aa = self.conv10a(wav)
+        bb = self.conv10b(wav)
+
+        combined = tf.concat([aa, bb], 3)
+        after = self.conv1(combined)
+        out_ = self.invwavelet(after)
+        out = input + out_
+        return out
+
+
+class ParallelNet_1(tf.keras.Model):
+    def __init__(self):
+        super(ParallelNet_1, self).__init__()
+        self.my_initial = tf.initializers.he_uniform()
+        
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+
+        self.wavelet = WaveletConvLayer()
+        self.invwavelet = WaveletInvLayer()
+        
+        self. conv10a = ConvBlock10(64, (3,3), self.my_initial, self.my_regular)
+        self.conv1 = layers.Conv2D(12, (3,3), padding = 'SAME', kernel_initializer=self.my_initial, kernel_regularizer=self.my_regular)
+
+    def call(self, input):
+        wav= self.wavelet(input)
+
+        aa = self.conv10a(wav)
+
+        after = self.conv1(aa)
+        out_ = self.invwavelet(after)
+        out = input + out_
+        return out
+
+
+
 
 
 

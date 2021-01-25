@@ -1,6 +1,47 @@
-from model_utility import ConvBlock10_2, WaveletInvLayer, WaveletConvLayer
+from model_utility import ConvBlock10, WaveletInvLayer, WaveletConvLayer
 import tensorflow as tf
 from tensorflow.keras import layers
+class DPW_SDNet(layers.Layer):
+    def __init__(self):
+        super().__init__()
+        self.my_initial = tf.random_normal_initializer(0, 0.01)
+        self.my_regular = tf.keras.regularizers.l2(l=0.000001)
+
+        self.wavelet = WaveletConvLayer()
+        self.invwavelet=WaveletInvLayer()
+        
+        self.wavConvBlock1 = ConvBlock10(64,(3,3), self.my_initial, self.my_regular)
+        self.wavConvBlock2 = ConvBlock10(64,(3,3), self.my_initial, self.my_regular)
+        self.wav_af = layers.Conv2D(12, (3,3), padding = 'SAME',
+            kernel_initializer=self.my_initial,kernel_regularizer=self.my_regular)# 
+       
+        self.pixConvBlock1 = ConvBlock10(64,(3,3), self.my_initial, self.my_regular)
+        self.pixConvBlock2 = ConvBlock10(64,(3,3), self.my_initial, self.my_regular)
+        self.pix_af = layers.Conv2D(12, (3,3), padding = 'SAME',
+            kernel_initializer=self.my_initial,kernel_regularizer=self.my_regular)# 
+       
+    
+    def call(self, input):
+        wav_in = self.wavelet(input)
+        pix_in = tf.nn.space_to_depth(input, 2, data_format='NHWC', name=None)
+
+        #wavlet branch
+        wavcon1 = self.wavConvBlock1(wav_in)
+        wavcon2 = self.wavConvBlock2(wavcon1)
+        wav_res = self.wav_af(wavcon2) + wav_in
+        invwav = self.invwavelet(wav_res)
+
+        #pixel branch
+        pixcon1 = self.pixConvBlock1(pix_in)
+        pixcon2 = self.pixConvBlock2(pixcon1)
+        pix_res = self.pix_af(pixcon2) + pix_in
+        invpix =  tf.nn.depth_to_space(pix_res, 2, data_format='NHWC', name=None)
+
+        output = (invwav + invpix)/2
+        
+        return output
+
+
 
 class DualinBlock(layers.Layer):
     def __init__(self, feature_num, kernel_size, my_initial, my_regular):
@@ -168,9 +209,9 @@ class DualinNet_fm64_20(tf.keras.Model):
 
         combined = tf.concat([main_20, aux_20],3)
 
-        after = self.conv(combined)
+        after = self.conv(combined) + wav_in
         
-        out = self.invwavelet(after) + input
+        out = self.invwavelet(after)
         
         return out
 

@@ -9,9 +9,9 @@ from pathlib import Path
 import os
 import numpy as np
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--stride', dest='stride', type=int, default=128, help='stride')
-parser.add_argument('--step', dest='step', type=int, default = 0, help='escape the first steps')
-parser.add_argument('--batch_size', dest='batch_size', type=int, default=32, help='DnCNN 64')
+parser.add_argument('--stride', dest='stride', type=int, default=156, help='stride')
+parser.add_argument('--step', dest='step', type=int, default = 10, help='escape the first steps')
+parser.add_argument('--batch_size', dest='batch_size', type=int, default=64, help='DnCNN 64')
 parser.add_argument('--patch_size', dest='patch_size', type=int, default=128, help='DnCNN 160, MWCNN 256')
 parser.add_argument('--isDebug', dest='isDebug', type=bool, default = False, help='True for 30 images')
 parser.add_argument('--save_dir', dest='save_dir', type=str, default = '/mnt/data4/Students/Lisha/patches_128', help='save path')
@@ -43,9 +43,9 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
 
     origin_patch_num = count
     if origin_patch_num % args.batch_size != 0:
-        numPatches = int(origin_patch_num / args.batch_size) * args.batch_size
+        numPatches = 21*int(origin_patch_num / args.batch_size) * args.batch_size
     else:
-        numPatches = int(origin_patch_num)
+        numPatches = 21*int(origin_patch_num)
 
     print("Total patches = %d , batch size = %d, total batches = %d" %(numPatches, args.batch_size, numPatches / args.batch_size))
     time.sleep(2)
@@ -58,10 +58,9 @@ def generate_patches(dir_label, dir_input, save_dir, tfRecord_name):
     for i in range(len(filepaths_label)):
         print("The %dth image of %d training images" %(i+1, len(filepaths_label)))
         
-        for q in range(0,21):#(13,14): #len(q_input)
+        for q in range(0,21): #q_10(2,3):#(0,21):#(13,14): #len(q_input)
             img = Image.open(filepaths_label[i])
             img_input = Image.open(Path(q_input[q], filenames[i]))
-            print(q_input[q])
             img_s = np.array(img, dtype="uint8")
             img_s_input = np.array(img_input, dtype="uint8")
             im_h, im_w, im_c = img_s.shape
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     src_dir_label = Path("/mnt/data4/Students/Lisha/images/train/groundtruth")
     src_dir_input = Path("/mnt/data4/Students/Lisha/images/train/qp0-100")
     save_dir = args.save_dir
-    tfRecord_name = 'train_data_all.tfrecords'
+    tfRecord_name = 'train_quality-blind.tfrecords'#'train_data.tfrecords'
     print("Training data will be generated:")
     generate_patches(src_dir_label, src_dir_input, save_dir, tfRecord_name)
 

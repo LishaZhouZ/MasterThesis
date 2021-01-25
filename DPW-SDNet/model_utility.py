@@ -98,8 +98,6 @@ class ConvConcatLayer(layers.Layer):
     super(ConvConcatLayer, self).__init__()
     self.conv = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
         kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
-    self.conv2 = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
-        kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
     self.bn = layers.BatchNormalization()
     self.relu = layers.ReLU()
   
@@ -164,3 +162,50 @@ class ConvInvBlock(layers.Layer):
     a13 = self.alpha3(a12)
     return a13
 
+#new convolutional layers
+class ConvConcatLayer_with2conv(layers.Layer):
+  def __init__(self, feature_num, kernel_size, my_initial, my_regular, dilated=1):
+    super(ConvConcatLayer_with2conv, self).__init__()
+    self.conv1 = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
+        kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
+    self.bn = layers.BatchNormalization()
+    self.relu = layers.ReLU()
+    self.conv2 = layers.Conv2D(feature_num, kernel_size, dilation_rate = dilated, padding = 'SAME',
+        kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
+  
+  def call(self, inputs):
+    a = self.conv1(inputs)
+    b = self.bn(a)
+    c = self.relu(b)
+    d = self.conv2(c)
+    return d
+
+
+class ConvBlock10_2(layers.Layer):
+  def __init__(self, feature_num, kernel_size, my_initial, my_regular):
+    super(ConvBlock10_2, self).__init__()
+    self.alpha1 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha2 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha3 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha4 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha5 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha6 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha7 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha8 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha9 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+    self.alpha10 = ConvConcatLayer_with2conv(feature_num, kernel_size, my_initial, my_regular)
+
+  
+  def call(self, inputs):
+    a11 = self.alpha1(inputs)
+    a12 = self.alpha2(a11)
+    a13 = self.alpha3(a12)
+    a14 = self.alpha4(a13)
+    a15 = self.alpha5(a14)
+    a16 = self.alpha6(a15)
+    a17 = self.alpha7(a16)
+    a18 = self.alpha8(a17)
+    a19 = self.alpha9(a18)
+    a20 = self.alpha10(a19)
+    
+    return a20

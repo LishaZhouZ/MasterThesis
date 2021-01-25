@@ -5,7 +5,7 @@ from glob import glob
 import datetime
 import os
 os.environ["CUDA_DEVICES_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import tensorflow as tf
 import math
 from utils_py3_tfrecord_128 import read_and_decode
@@ -17,8 +17,8 @@ import numpy as np
 #L2 regularization
 #tensorboard
 
-def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches/train_data_q10_128.tfrecords', 
-    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='DualinNet', batch_size = 32, epochs = 40):
+def train_process(train_dataset_path = '/mnt/data4/Students/Lisha/patches_128/train_quality-blind.tfrecords', 
+    lr = 0.001, ckpt_dir = '/mnt/data4/Students/Lisha/tf_ckpts/', name='DualinNet_fm64_20_quality_blind', batch_size = 64, epochs = 40):
     gpus = tf.config.list_physical_devices('GPU')
     try:
         tf.config.experimental.set_memory_growth(gpus[0], True)

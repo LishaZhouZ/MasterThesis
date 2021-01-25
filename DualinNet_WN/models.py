@@ -1,20 +1,21 @@
 from model_utility import ConvBlock10_2, WaveletInvLayer, WaveletConvLayer
 import tensorflow as tf
 from tensorflow.keras import layers
+import tensorflow_addons as tfa
 
 class DualinBlock(layers.Layer):
     def __init__(self, feature_num, kernel_size, my_initial, my_regular):
         super(DualinBlock, self).__init__()
         self.conv1_main = layers.Conv2D(feature_num, kernel_size, padding = 'SAME',
             kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
-        self.bn_main = layers.BatchNormalization()
+        self.bn_main = tfa.layers.WeightNormalization()
         self.relu_main = layers.ReLU()
         self.conv2_main = layers.Conv2D(feature_num, kernel_size, padding = 'SAME',
             kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
         
         self.conv1_aux = layers.Conv2D(feature_num, kernel_size, padding = 'SAME',
             kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
-        self.bn_aux = layers.BatchNormalization()
+        self.bn_aux = tfa.layers.WeightNormalization()
         self.relu_aux = layers.ReLU()
         self.conv2_aux = layers.Conv2D(feature_num, kernel_size, padding = 'SAME',
             kernel_initializer=my_initial,kernel_regularizer=my_regular)# 
